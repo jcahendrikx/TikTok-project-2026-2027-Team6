@@ -12,7 +12,7 @@
 - Explaining basic git code commands
 - Assistance with basic terminal commands such as creating new md files
 - Debugging Git and file-path issues
-
+- Formatting the main README.md file
 
 #### Output Validation
 - If the output was a code line or block, it was always ran multiple times on both computers to make sure it would run in all cases and not solely locally
