@@ -3,11 +3,77 @@ title: "Summary of videos"
 format: html
 ---
 
+# TikTok Video View Summary
+This report provides an overview of the TikTok video view dataset and summarizes several key performance indicators.
+
+## 1. Load the Data
 ```{r}
 library(tidyverse)
+
 videos <- read.csv("data/raw/video_view.csv")
-head(videos)
-
-
-
 ```
+
+## 2. Dataset Overview
+```{r}
+head(videos)
+glimpse(videos)
+```
+This section provides a first look at the structure and contents of the dataset.
+
+## 3. Missing Values Check
+```{r}
+videos %>%
+  summarise(
+    missing_watch_rate = sum(is.na(watch_rate)),
+    missing_impressions = sum(is.na(impressions_n))
+  )
+```
+This check shows whether missing values are present in the main variables used in the analysis.
+
+## 4. Summary Statistics
+```{r}
+videos %>%
+  summarise(
+    number_of_videos = n(),
+    total_impressions = sum(impressions_n, na.rm = TRUE),
+    average_watch_rate = mean(watch_rate, na.rm = TRUE)
+  )
+```
+These summary statistics provide an overview of the number of videos, total impressions, and average watch rate in the dataset.
+
+## 5. Creator Summary
+```{r}
+creator_summary <- videos %>%
+  group_by(creator_id) %>%
+  summarise(
+    videos_n = n(),
+    impressions_total = sum(impressions_n, na.rm = TRUE),
+    watch_rate_avg = mean(watch_rate, na.rm = TRUE)
+  ) %>%
+  arrange(desc(impressions_total))
+
+creator_summary
+```
+The creator summary compares creators based on their number of videos, total impressions, and average watch rate.
+
+## 6. Top 5 Videos by Impressions
+```{r}
+videos %>%
+  arrange(desc(impressions_n)) %>%
+  select(video_id, creator_id, impressions_n, watch_rate) %>%
+  head(5)
+```
+This table identifies the five videos with the highest number of impressions.
+
+## 7. Publishing Date Analysis
+```{r} 
+arranged_date <- videos %>% 
+    mutate(publishing_date = as.POSIXct(published_at, origin = "1970-01-01", tz = "CET")) %>%
+    select(creator_id, video_id, publishing_date, watch_rate) %>% 
+    arrange(desc(publishing_date))
+head(arranged_date, 20)
+```
+The above code shows the earliest 20 videos inside of the dataset and their corresponding dates, derived from the UNIX code. It assumes that the UNIX seconds are recorded in accordance with the CET timezone
+
+# Conclusion
+The analysis provides a general overview of the dataset, checks for missing values, summarizes overall performance, compares creators, and identifies the videos with the highest number of impressions.
