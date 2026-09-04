@@ -1,0 +1,13 @@
+---
+title: "Summary of videos"
+format: html
+---
+
+```{r}
+library(tidyverse)
+videos <- read.csv("data/raw/video_view.csv")
+head(videos)
+
+
+
+```
