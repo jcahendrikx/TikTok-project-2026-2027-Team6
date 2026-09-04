@@ -9,10 +9,10 @@ This report provides an overview of the TikTok video view dataset and summarizes
 ## 1. Load the Data
 ```{r}
 library(tidyverse)
-
-videos <- read.csv("data/raw/video_view.csv")
+library(here)
+videos <- read.csv(here("data", "raw", "video_view.csv"))
 ```
-
+Due to the folder structure, we have to make use of the "here" package so that the file runs both normally and when it is rendered
 ## 2. Dataset Overview
 ```{r}
 head(videos)
@@ -74,6 +74,20 @@ arranged_date <- videos %>%
 head(arranged_date, 20)
 ```
 The above code shows the earliest 20 videos inside of the dataset and their corresponding dates, derived from the UNIX code. It assumes that the UNIX seconds are recorded in accordance with the CET timezone
+
+## Time Between Impressions Analysis
+```{r}
+time_between_impressions <- videos %>% 
+    filter(!is.na(first_impression_at)) %>% 
+    filter(!is.na(last_impression_at)) %>% 
+    mutate(time_between_first_and_last_impression = last_impression_at - first_impression_at) %>% 
+    mutate(hours_between_first_and_last_impression = time_between_first_and_last_impression / 3600) %>%
+    mutate(days_between_first_and_last_impression = hours_between_first_and_last_impression / 24) %>% 
+    select(creator_id, video_id, impressions_n, days_between_first_and_last_impression, hours_between_first_and_last_impression) %>%
+    arrange(desc(hours_between_first_and_last_impression))
+head(time_between_impressions) 
+```
+The above code first filters out videos with missing values for first and last impressions, then calculates the difference between the two, transforms this into hours and days, and finally arranges from largest gap between impressions to the smallest gap between first and last impressions.
 
 # Conclusion
 The analysis provides a general overview of the dataset, checks for missing values, summarizes overall performance, compares creators, and identifies the videos with the highest number of impressions.
