@@ -1,5 +1,11 @@
-# TikTok-project-template-2026
-This repository is a template for the Data preparation and programming skills in fall 2026. 
+# TikTok-project-2026-Team6
+Tilburg University
+Data Preparation & Programming
+
+Project Owners: 
+- Alex Hendrikx
+- Nanyun Zhang
+
 
 ## Project Goal
 The goal of this project is to create a reproducible workflow for downloading and summarizing TikTok video view data using R, Quarto, Git, and GitHub.
@@ -21,6 +27,7 @@ The following software and R packages are required:
 - R
 - Quarto
 - tidyverse
+- here
 
 The required R package can be installed using:
 
