@@ -125,70 +125,73 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>here() starts at C:/Users/alexh/OneDrive/Documents/Research Master/Year 2/Semester 1/Data Preparation and Programing/TeamAssignment/TikTok-project-2026-2027-Team6</code></pre>
+<pre><code>here() starts at D:/0 research master/Year 2 1a/Data Preparation and Programming Skills/TeamAssignment/TikTok-project-2026-2027-Team6</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>videos <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"raw"</span>, <span class="st">"video_view.csv"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Due to the folder structure, we have to make use of the “here” package so that the file runs both normally and when it is rendered ## 2. Dataset Overview</p>
+<p>The <code>here</code> package is used to locate the dataset from the project root, ensuring that the file can also be found when the Quarto document is rendered.</p>
+</section>
+<section id="dataset-overview" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-overview">2. Dataset Overview</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(videos)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  video_id creator_id video_length_sec published_at
-1        1         37               24   1754354430
-2        2          5               52   1756627738
-3        3         46               23   1758745786
-4        4         48               36   1754929845
-5        5         47               33   1755603913
-6        6         26               34   1755473145
-                                                          video_url
-1 https://www.tiktok.com/@charlottegarcia/video/9000000000000000001
-2 https://www.tiktok.com/@evelyndaily3219/video/9000000000000000002
-3 https://www.tiktok.com/@benjaminhub4825/video/9000000000000000003
-4  https://www.tiktok.com/@isabellahub287/video/9000000000000000004
-5     https://www.tiktok.com/@avawalker_1/video/9000000000000000005
-6    https://www.tiktok.com/@noahlive7510/video/9000000000000000006
+1        1         66               14   1767297237
+2        2         62               47   1768475971
+3        3        176               37   1766815457
+4        4         22               29   1755689136
+5        5         39               28   1762696418
+6        6        148               36   1764970157
+                                                         video_url
+1 https://www.tiktok.com/@olivialive2824/video/9000000000000000001
+2  https://www.tiktok.com/@isabellabrown/video/9000000000000000002
+3 https://www.tiktok.com/@isabellawalker/video/9000000000000000003
+4    https://www.tiktok.com/@lucastaylor/video/9000000000000000004
+5       https://www.tiktok.com/@avabrown/video/9000000000000000005
+6 https://www.tiktok.com/@harperwalker_1/video/9000000000000000006
   impressions_n watched_n watch_rate avg_watch_seconds_when_watched
-1            66        42  0.6363636                       12.04762
-2            15         9  0.6000000                       34.11111
-3             1         0  0.0000000                             NA
-4            42        23  0.5476190                       14.47826
-5            24        21  0.8750000                       17.23810
-6            26        11  0.4230769                       21.27273
+1             4         3  0.7500000                       10.66667
+2             0         0         NA                             NA
+3            14        10  0.7142857                       18.60000
+4            67        49  0.7313433                       15.38776
+5            25        18  0.7200000                       14.44444
+6            14         7  0.5000000                       19.00000
   total_watch_seconds avg_watch_share distinct_watchers_n first_impression_at
-1                 506       0.3194444                  34          1754358053
-2                 307       0.3935897                   8          1756749929
-3                   0       0.0000000                   0          1758673041
-4                 333       0.2202381                  18          1754925674
-5                 362       0.4570707                  17          1755665455
-6                 234       0.2647059                  11          1755451424
+1                  32       0.5714286                   3          1768287244
+2                   0              NA                   0                  NA
+3                 186       0.3590734                  10          1766868873
+4                 754       0.3880597                  43          1755661745
+5                 260       0.3714286                  15          1762792600
+6                 133       0.2638889                   7          1765069292
   last_impression_at first_watch_at last_watch_at
-1         1758872692     1754358053    1758872692
-2         1758795937     1756749929    1758795937
-3         1758673041     1758673041    1758673041
-4         1759091428     1754925674    1759091428
-5         1758877787     1755665455    1758877787
-6         1758656774     1755451424    1758656774</code></pre>
+1         1769439546     1768287244    1769439546
+2                 NA             NA            NA
+3         1769741156     1766868873    1769741156
+4         1769429852     1755661745    1769429852
+5         1769860569     1762792600    1769860569
+6         1769101217     1765069292    1769101217</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(videos)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Rows: 1,200
+<pre><code>Rows: 15,000
 Columns: 16
 $ video_id                       &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, …
-$ creator_id                     &lt;int&gt; 37, 5, 46, 48, 47, 26, 34, 17, 44, 56, …
-$ video_length_sec               &lt;int&gt; 24, 52, 23, 36, 33, 34, 31, 48, 32, 32,…
-$ published_at                   &lt;int&gt; 1754354430, 1756627738, 1758745786, 175…
-$ video_url                      &lt;chr&gt; "https://www.tiktok.com/@charlottegarci…
-$ impressions_n                  &lt;int&gt; 66, 15, 1, 42, 24, 26, 21, 31, 14, 18, …
-$ watched_n                      &lt;int&gt; 42, 9, 0, 23, 21, 11, 15, 22, 6, 10, 13…
-$ watch_rate                     &lt;dbl&gt; 0.6363636, 0.6000000, 0.0000000, 0.5476…
-$ avg_watch_seconds_when_watched &lt;dbl&gt; 12.04762, 34.11111, NA, 14.47826, 17.23…
-$ total_watch_seconds            &lt;int&gt; 506, 307, 0, 333, 362, 234, 304, 408, 1…
-$ avg_watch_share                &lt;dbl&gt; 0.3194444, 0.3935897, 0.0000000, 0.2202…
-$ distinct_watchers_n            &lt;int&gt; 34, 8, 0, 18, 17, 11, 14, 20, 6, 10, 12…
-$ first_impression_at            &lt;int&gt; 1754358053, 1756749929, 1758673041, 175…
-$ last_impression_at             &lt;int&gt; 1758872692, 1758795937, 1758673041, 175…
-$ first_watch_at                 &lt;int&gt; 1754358053, 1756749929, 1758673041, 175…
-$ last_watch_at                  &lt;int&gt; 1758872692, 1758795937, 1758673041, 175…</code></pre>
+$ creator_id                     &lt;int&gt; 66, 62, 176, 22, 39, 148, 158, 30, 200,…
+$ video_length_sec               &lt;int&gt; 14, 47, 37, 29, 28, 36, 30, 34, 25, 48,…
+$ published_at                   &lt;int&gt; 1767297237, 1768475971, 1766815457, 175…
+$ video_url                      &lt;chr&gt; "https://www.tiktok.com/@olivialive2824…
+$ impressions_n                  &lt;int&gt; 4, 0, 14, 67, 25, 14, 23, 19, 6, 86, 4,…
+$ watched_n                      &lt;int&gt; 3, 0, 10, 49, 18, 7, 19, 14, 4, 64, 3, …
+$ watch_rate                     &lt;dbl&gt; 0.7500000, NA, 0.7142857, 0.7313433, 0.…
+$ avg_watch_seconds_when_watched &lt;dbl&gt; 10.66667, NA, 18.60000, 15.38776, 14.44…
+$ total_watch_seconds            &lt;int&gt; 32, 0, 186, 754, 260, 133, 322, 273, 73…
+$ avg_watch_share                &lt;dbl&gt; 0.5714286, NA, 0.3590734, 0.3880597, 0.…
+$ distinct_watchers_n            &lt;int&gt; 3, 0, 10, 43, 15, 7, 19, 14, 4, 59, 3, …
+$ first_impression_at            &lt;int&gt; 1768287244, NA, 1766868873, 1755661745,…
+$ last_impression_at             &lt;int&gt; 1769439546, NA, 1769741156, 1769429852,…
+$ first_watch_at                 &lt;int&gt; 1768287244, NA, 1766868873, 1755661745,…
+$ last_watch_at                  &lt;int&gt; 1769439546, NA, 1769741156, 1769429852,…</code></pre>
 </div>
 </div>
 <p>This section provides a first look at the structure and contents of the dataset.</p>
@@ -203,7 +206,7 @@ $ last_watch_at                  &lt;int&gt; 1758872692, 1758795937, 1758673041,
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  missing_watch_rate missing_impressions
-1                 30                   0</code></pre>
+1                384                   0</code></pre>
 </div>
 </div>
 <p>This check shows whether missing values are present in the main variables used in the analysis.</p>
@@ -219,7 +222,7 @@ $ last_watch_at                  &lt;int&gt; 1758872692, 1758795937, 1758673041,
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  number_of_videos total_impressions average_watch_rate
-1             1200             27862           0.681892</code></pre>
+1            15000            446422          0.6946644</code></pre>
 </div>
 </div>
 <p>These summary statistics provide an overview of the number of videos, total impressions, and average watch rate in the dataset.</p>
@@ -238,20 +241,20 @@ $ last_watch_at                  &lt;int&gt; 1758872692, 1758795937, 1758673041,
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>creator_summary</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 60 × 4
+<pre><code># A tibble: 200 × 4
    creator_id videos_n impressions_total watch_rate_avg
         &lt;int&gt;    &lt;int&gt;             &lt;int&gt;          &lt;dbl&gt;
- 1         27       46              1344          0.673
- 2         42       52              1141          0.688
- 3         23       35              1123          0.662
- 4         20       48               989          0.705
- 5         16       29               852          0.694
- 6         22       35               851          0.669
- 7          3       29               801          0.616
- 8         40       24               721          0.720
- 9         60       35               712          0.697
-10         59       28               702          0.675
-# ℹ 50 more rows</code></pre>
+ 1          7      152              5791          0.700
+ 2         96      184              5734          0.665
+ 3         49      173              5430          0.719
+ 4        196      143              5152          0.680
+ 5        134      163              5105          0.696
+ 6         75      165              4796          0.704
+ 7        177      150              4588          0.688
+ 8         32      148              4580          0.697
+ 9        133      152              4566          0.699
+10         10      162              4560          0.706
+# ℹ 190 more rows</code></pre>
 </div>
 </div>
 <p>The creator summary compares creators based on their number of videos, total impressions, and average watch rate.</p>
@@ -265,51 +268,52 @@ $ last_watch_at                  &lt;int&gt; 1758872692, 1758795937, 1758673041,
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  video_id creator_id impressions_n watch_rate
-1      481         53           153  0.7189542
-2      449          3           141  0.6312057
-3       24         23           139  0.6115108
-4      304         25           138  0.6376812
-5      509         31           130  0.7076923</code></pre>
+1    13801        197           230  0.6782609
+2     2269        156           222  0.6531532
+3     8927         24           220  0.7181818
+4     5234        171           215  0.6930233
+5     5494         51           215  0.6279070</code></pre>
 </div>
 </div>
 <p>This table identifies the five videos with the highest number of impressions.</p>
 </section>
-<section id="publishing-date-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="publishing-date-analysis">7. Publishing Date Analysis</h2>
+<section id="publishing-date" class="level2">
+<h2 class="anchored" data-anchor-id="publishing-date">7. Publishing Date</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>arranged_date <span class="ot">&lt;-</span> videos <span class="sc">%&gt;%</span> </span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>arranged_date <span class="ot">&lt;-</span> videos <span class="sc">%&gt;%</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">publishing_date =</span> <span class="fu">as.POSIXct</span>(published_at, <span class="at">origin =</span> <span class="st">"1970-01-01"</span>, <span class="at">tz =</span> <span class="st">"CET"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(creator_id, video_id, publishing_date, watch_rate) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(publishing_date))</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(arranged_date, <span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(creator_id, video_id, publishing_date, watch_rate) <span class="sc">%&gt;%</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(publishing_date)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(arranged_date, <span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   creator_id video_id     publishing_date watch_rate
-1          55      542 2025-09-30 01:49:28         NA
-2          58      336 2025-09-30 01:31:15        0.0
-3          42      938 2025-09-29 22:16:36        1.0
-4          43       59 2025-09-29 21:30:47         NA
-5          27     1115 2025-09-29 20:54:54         NA
-6          45      239 2025-09-29 19:40:07         NA
-7          29       22 2025-09-29 18:53:59         NA
-8          37      990 2025-09-29 18:47:24        0.0
-9          30      620 2025-09-29 17:41:45         NA
-10         42      109 2025-09-29 17:32:19         NA
-11         17      710 2025-09-29 17:02:36        1.0
-12         20     1035 2025-09-29 14:34:23         NA
-13         46     1009 2025-09-29 12:28:24         NA
-14         21     1067 2025-09-29 08:39:08        0.5
-15         45      917 2025-09-29 08:08:44         NA
-16         23     1140 2025-09-29 07:07:15         NA
-17         35      788 2025-09-29 06:51:12         NA
-18         26      347 2025-09-29 05:41:56         NA
-19         60      406 2025-09-29 03:34:55        1.0
-20          5       45 2025-09-29 03:23:34        0.5</code></pre>
+1          97     7580 2025-08-01 02:03:03  0.7482014
+2          71     5004 2025-08-01 02:07:41  0.7619048
+3         171     9014 2025-08-01 02:10:59  0.7209302
+4         124     6899 2025-08-01 02:18:54  0.7388889
+5         117     4436 2025-08-01 02:45:17  0.7250000
+6          70     3970 2025-08-01 03:05:42  0.6731707
+7         181     8436 2025-08-01 03:09:26  0.7099237
+8         135    14581 2025-08-01 03:19:33  0.7086614
+9         160     1722 2025-08-01 03:28:21  0.7005650
+10        197     2138 2025-08-01 03:54:25  0.7175573
+11        143    11983 2025-08-01 04:11:53  0.7647059
+12         83     3445 2025-08-01 05:02:03  0.7293233
+13        116     6159 2025-08-01 05:09:18  0.7611940
+14         80    14275 2025-08-01 05:11:21  0.6953125
+15          7    12525 2025-08-01 05:28:32  0.7412587
+16        172     8829 2025-08-01 05:44:29  0.6376812
+17         17    13813 2025-08-01 05:46:50  0.7165354
+18        167    10974 2025-08-01 05:48:32  0.7135678
+19        194    14704 2025-08-01 06:39:30  0.6845638
+20        133     7472 2025-08-01 06:42:54  0.7222222</code></pre>
 </div>
 </div>
-<p>The above code shows the earliest 20 videos inside of the dataset and their corresponding dates, derived from the UNIX code. It assumes that the UNIX seconds are recorded in accordance with the CET timezone</p>
+<p>The above code shows the earliest 20 videos inside of the dataset and their corresponding dates, derived from the UNIX code. The UNIX timestamps are converted into readable dates using the CET timezone.</p>
 </section>
-<section id="time-between-impressions-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="time-between-impressions-analysis">Time Between Impressions Analysis</h2>
+<section id="time-between-impressions" class="level2">
+<h2 class="anchored" data-anchor-id="time-between-impressions">8. Time Between Impressions</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>time_between_impressions <span class="ot">&lt;-</span> videos <span class="sc">%&gt;%</span> </span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(first_impression_at)) <span class="sc">%&gt;%</span> </span>
@@ -322,19 +326,19 @@ $ last_watch_at                  &lt;int&gt; 1758872692, 1758795937, 1758673041,
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(time_between_impressions) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  creator_id video_id impressions_n days_between_first_and_last_impression
-1         27      518           110                               59.88981
-2         23     1159           100                               59.69771
-3         53      481           153                               59.69073
-4          7      144            19                               59.68453
-5          3      449           141                               59.67679
-6         22      160             4                               59.56961
+1         10    11739           140                               183.8733
+2         24     8927           220                               183.8441
+3          2     2837           154                               183.8008
+4        149    11128           134                               183.7958
+5        155     4597           151                               183.7946
+6         30       33            68                               183.7037
   hours_between_first_and_last_impression
-1                                1437.356
-2                                1432.745
-3                                1432.578
-4                                1432.429
-5                                1432.243
-6                                1429.671</code></pre>
+1                                4412.959
+2                                4412.259
+3                                4411.218
+4                                4411.099
+5                                4411.071
+6                                4408.888</code></pre>
 </div>
 </div>
 <p>The above code first filters out videos with missing values for first and last impressions, then calculates the difference between the two, transforms this into hours and days, and finally arranges from largest gap between impressions to the smallest gap between first and last impressions.</p>
@@ -342,7 +346,7 @@ $ last_watch_at                  &lt;int&gt; 1758872692, 1758795937, 1758673041,
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
-<p>The analysis provides a general overview of the dataset, checks for missing values, summarizes overall performance, compares creators, and identifies the videos with the highest number of impressions.</p>
+<p>Overall, the analysis provides an overview of the TikTok video view dataset, including missing values, creator performance, publishing dates, impression duration, and the videos with the highest impressions. These summaries help identify differences in reach, engagement, and the timing of impressions across videos.</p>
 </section>
 
 </main>
