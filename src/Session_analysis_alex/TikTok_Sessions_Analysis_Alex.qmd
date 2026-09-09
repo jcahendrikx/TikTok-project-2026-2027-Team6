@@ -1,10 +1,43 @@
 ---
-title: "Analysis of Tiktok Sessions Dataset"
+title: "Visual Analysis of Tiktok Sessions Dataset"
 format: html
 ---
+# TikTok Sessions Visual Analysis
+This report provides a visual overview of the TikTok Sessions dataset using several key performance indicators.
 
 
+## 1. Download The Needed Packages
 ```{r}
 library(tidyverse)
+library(here)
 library(ggplot2)
 ```
+For this analysis, the following packages are needed: 1. tidyverse, 2. ggplot2, 3. here
+
+### 2. Loading The Data
+
+```{r}
+sessions <- read.csv(here("data", "data_session", "sessions.csv"))
+head(sessions)
+dim(sessions)
+summary(sessions)
+```
+It shows that the sessions datafile consists of only 7 columns, but almost 100,000 rows of data
+
+### 3. Checking
+
+
+### 4. Removing Rows with Missing Data for Critical Variables
+
+```{r}
+missing_data <- sessions %>% 
+    select(session_duration_sec, videos_viewed, watch_seconds) %>% 
+    summarise(across(everything (),
+    list(missing = ~sum(is.na(.)))
+    ))
+
+missing_data
+```
+So, according to this code, the three key numeric data columns do not have any missing data
+
+### 4.
