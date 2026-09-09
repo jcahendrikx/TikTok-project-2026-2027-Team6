@@ -1,0 +1,10 @@
+---
+title: "Analysis of Tiktok Sessions Dataset"
+format: html
+---
+
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
