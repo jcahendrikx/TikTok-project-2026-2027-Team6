@@ -10,34 +10,97 @@ This report provides a visual overview of the TikTok Sessions dataset using seve
 ```{r}
 library(tidyverse)
 library(here)
-library(ggplot2)
 ```
-For this analysis, the following packages are needed: 1. tidyverse, 2. ggplot2, 3. here
+For this analysis, the following packages are needed: 1. tidyverse, 2. here
 
 ### 2. Loading The Data
 
 ```{r}
-sessions <- read.csv(here("data", "data_session", "sessions.csv"))
+sessions <- read.csv(here("data", "data_session", "processed", "cleaned_sessions.csv"))
 head(sessions)
-dim(sessions)
 summary(sessions)
 ```
-It shows that the sessions datafile consists of only 7 columns, but almost 100,000 rows of data
 
-### 3. Checking
-
-
-### 4. Removing Rows with Missing Data for Critical Variables
+### 3. Create Folder for Plot Outputs
 
 ```{r}
-missing_data <- sessions %>% 
-    select(session_duration_sec, videos_viewed, watch_seconds) %>% 
-    summarise(across(everything (),
-    list(missing = ~sum(is.na(.)))
-    ))
-
-missing_data
+if (!dir.exists("output/week3")) {
+  dir.create("output/week3", recursive = TRUE)
+}
 ```
-So, according to this code, the three key numeric data columns do not have any missing data
 
-### 4.
+### 4. Histogram of Videos Distribution of Users
+
+```{r}
+user_totals <- sessions %>% #Aggregate videos watched per user
+  group_by(user_id) %>%
+  summarise(total_videos = sum(videos_viewed, na.rm = TRUE), .groups = "drop")
+
+video_distribution <- user_totals %>% #Frequency of each total videos
+  group_by(total_videos) %>%
+  summarise(user_count = n(), .groups = "drop")
+
+
+ggplot(user_totals, aes(x = total_videos)) + # Plot the distribution as a histogram
+  geom_histogram(binwidth = 10, fill = "#6497b1", color = "white") +
+  labs(
+    title = "Distribution of User Video Viewing",
+    subtitle = "Bar Width = 10 Videos",
+    x = "Total Videos Watched",
+    y = "Number of Users"
+  ) +
+  theme_minimal()
+
+ggsave("output/week3/histogram_videos_per_user.png")
+```
+This histogram shows the distribution of total videos watched per user. Most users viewed around 100 videos, but there are several users with totals exceeding 300, resulting in a right-skewed distribution, rather than a symmaterical normal distribution.
+
+
+### 5. Distribution of the Number of Sessions per User
+
+```{r}
+session_counts <- sessions %>% # Count sessions per user
+  group_by(user_id) %>%
+  summarise(num_sessions = n(), .groups = "drop")
+
+
+ggplot(session_counts, aes(x = num_sessions)) +
+  geom_histogram(binwidth = 5, fill = "#6497b1", color = "white") +
+  labs(
+    title = "Distribution of Sessions per User",
+    subtitle = "Bar width = 5 Sessions",
+    x = "Number of Sessions",
+    y = "Number of Users"
+  ) +
+  theme_minimal()
+
+ggsave("output/week3/histogram_sessions_per_user.png")
+```
+This histogram shows the distribution of total watch sessions per user. Most users had around 30 watch sessions, but there are several users with total watch sessions exceeding 80, resulting in a right-skewed distribution, rather than a symmaterical normal distribution. 
+
+### 6. ScatterPlot Sessions and Video Watched per User
+A similar distribution is seen in the above two graph, suggesting correlation and potentially causation between Number of Sessions and Videos Watched per User. Therefore a scatter plot will be performed to view this possible correlation.
+
+```{r}
+user_summary <- sessions %>% #Recreate the two variables as they both existed in seperate stored dataframes
+  group_by(user_id) %>%
+  summarise(
+    total_videos = sum(videos_viewed, na.rm = TRUE),
+    num_sessions = n(),
+    .groups = "drop"
+  )
+
+ggplot(user_summary, aes(x = num_sessions, y = total_videos)) +
+  geom_point(color = "#6497b1", alpha = 0.6, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed") +
+  labs(
+    title = "Scatterplot: Videos Watched vs Sessions per User",
+    x = "Number of Sessions",
+    y = "Total Videos Watched"
+  ) +
+  theme_minimal()
+
+ggsave("output/week3/scatter_sessions_vs_videos.png")
+```
+The scatter plot and the included black dashed regression line show a clear linear correlation between the number of sessions and number of videos watched. While this is no clear sign of causation, it can be argued that on average, when the number of sessions per user increases, the number of videos watched per user also increases.
+
