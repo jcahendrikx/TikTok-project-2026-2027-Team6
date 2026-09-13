@@ -13,7 +13,7 @@ library(here)
 ```
 For this analysis, the following packages are needed: 1. tidyverse, 2. here
 
-### 2. Loading The Data
+## 2. Loading The Data
 
 ```{r}
 sessions <- read.csv(here("data", "data_session", "processed", "cleaned_sessions.csv"))
@@ -21,7 +21,7 @@ head(sessions)
 summary(sessions)
 ```
 
-### 3. Create Folder for Plot Outputs
+## 3. Create Folder for Plot Outputs
 
 ```{r}
 if (!dir.exists("output/week3")) {
@@ -29,7 +29,7 @@ if (!dir.exists("output/week3")) {
 }
 ```
 
-### 4. Histogram of Videos Distribution of Users
+## 4. Histogram of Watched Videos Distribution of Users
 
 ```{r}
 user_totals <- sessions %>% #Aggregate videos watched per user
@@ -56,7 +56,7 @@ ggsave("output/week3/histogram_videos_per_user.png")
 This histogram shows the distribution of total videos watched per user. Most users viewed around 100 videos, but there are several users with totals exceeding 300, resulting in a right-skewed distribution, rather than a symmaterical normal distribution.
 
 
-### 5. Distribution of the Number of Sessions per User
+## 5. Distribution of the Number of Sessions per User
 
 ```{r}
 session_counts <- sessions %>% # Count sessions per user
@@ -78,7 +78,7 @@ ggsave("output/week3/histogram_sessions_per_user.png")
 ```
 This histogram shows the distribution of total watch sessions per user. Most users had around 30 watch sessions, but there are several users with total watch sessions exceeding 80, resulting in a right-skewed distribution, rather than a symmaterical normal distribution. 
 
-### 6. ScatterPlot Sessions and Video Watched per User
+## 6. Scatter Plot Sessions and Video Watched per User
 A similar distribution is seen in the above two graph, suggesting correlation and potentially causation between Number of Sessions and Videos Watched per User. Therefore a scatter plot will be performed to view this possible correlation.
 
 ```{r}
@@ -104,3 +104,18 @@ ggsave("output/week3/scatter_sessions_vs_videos.png")
 ```
 The scatter plot and the included black dashed regression line show a clear linear correlation between the number of sessions and number of videos watched. While this is no clear sign of causation, it can be argued that on average, when the number of sessions per user increases, the number of videos watched per user also increases.
 
+## 7. Scatter Plot Session Duration and Videos Viewed
+
+```{r}
+ggplot(sessions, aes(x = session_duration_sec, y = videos_viewed)) +
+  geom_point(alpha = 0.4, color = "#6497b1") +
+  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed") +
+  labs(title = "Session Duration vs. Videos Viewed", x = "Session Duration (sec)", y = "Videos Viewed") +
+  theme_minimal()
+
+ggsave("output/week3/scatter_seconds_vs_videos.png")
+```
+This scatter plot of the duration of each session versus the number of videos watched per session shows whether longer sessions are typically associated with watching more videos, as one would logically presume. This positive association does indeed exist, as shown by the upsloping black regression line.
+
+## Conclusion
+Most users show moderate engagement, but both videos watched and session counts are right-skewed with some highly active outliers. Clear positive correlations exist between session frequency, session duration, and the number of videos watched, highlighting that more active users tend to watch more content.
