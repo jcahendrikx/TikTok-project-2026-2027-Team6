@@ -60,9 +60,7 @@ Then render the Quarto analysis:
 quarto render src/Session_analysis_alex/Tiktok_Session_Analysis_Alex.qmd
 ```
 ### Makefile
-Another option is to simply run the Makefile. To do that, first change your working directory to the analysis folder in the terminal:
-`cd src/Session_analysis_alex`
-Then, run the following code in the terminal from the root depository:
+Another option is to simply run the Makefile. Run the following code in the terminal from the root depository:
 `make`
 
 The Quarto document reads the downloaded data from `data/datas_session/processed` and produces an HTML summary containing summaries and visualizations. Additionally, these visualizations are stored in `output/week3/`.

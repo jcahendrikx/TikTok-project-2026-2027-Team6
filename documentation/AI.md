@@ -28,3 +28,4 @@
 - Assisted in Code-Creation for the Visual Plots (Not in Idea-Creation).
 - Assisted in formulating a clear Conclusion in the Analysis File.
 - Assisted in creating the instructions of how to reproduce the analysis in the ReadME file.
+- Assisted in debugging the Makefile
