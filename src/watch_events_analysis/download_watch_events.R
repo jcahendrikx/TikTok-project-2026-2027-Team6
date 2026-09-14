@@ -1,6 +1,11 @@
 # Download the TikTok watch events dataset
 
-data_dir <- "../../data/watch_events"
+library(here)
+
+data_dir <- here(
+  "data",
+  "watch_events"
+)
 
 dir.create(
   data_dir,
