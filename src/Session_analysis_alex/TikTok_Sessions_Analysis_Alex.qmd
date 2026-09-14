@@ -119,4 +119,4 @@ ggsave(here("output", "week3", "scatter_seconds_vs_videos.png"))
 This scatter plot of the duration of each session versus the number of videos watched per session shows whether longer sessions are typically associated with watching more videos, as one would logically presume. This positive association does indeed exist, as shown by the upsloping black regression line.
 
 ## Conclusion
-Most users show moderate engagement, but both videos watched and session counts are right-skewed with some highly active outliers. Clear positive correlations exist between session frequency, session duration, and the number of videos watched, highlighting that more active users tend to watch more content.
+Most users show moderate engagement, but both videos watched and session counts are right-skewed with some highly active outliers. Clear positive correlations exist between session frequency, session duration, and the number of videos watched, highlighting that more active users tend to watch more content

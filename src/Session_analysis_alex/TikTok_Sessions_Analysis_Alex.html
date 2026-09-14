@@ -136,35 +136,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sessions <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"data_session"</span>, <span class="st">"processed"</span>, <span class="st">"cleaned_sessions.csv"</span>))</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sessions)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  session_id user_id             login_at            logout_at
-1          1       4 2025-08-01T19:45:47Z 2025-08-01T19:45:53Z
-2          2       5 2025-08-01T01:06:14Z 2025-08-01T01:06:23Z
-3          3       5 2025-08-01T15:37:20Z 2025-08-01T15:40:33Z
-4          4       6 2025-08-01T20:53:43Z 2025-08-01T20:55:33Z
-5          5       7 2025-08-01T08:05:29Z 2025-08-01T08:05:36Z
-6          6      11 2025-08-01T18:53:27Z 2025-08-01T18:54:01Z
-  session_duration_sec videos_viewed watch_seconds
-1                    6             1             3
-2                    9             1             7
-3                  193            10           168
-4                  110             7            90
-5                    7             1             5
-6                   34             3            22</code></pre>
+<pre><code>  session_id user_id   login_at  logout_at session_duration_sec videos_viewed
+1          1       4 2025-08-01 2025-08-01                    6             1
+2          2       5 2025-08-01 2025-08-01                    9             1
+3          3       5 2025-08-01 2025-08-01                  193            10
+4          4       6 2025-08-01 2025-08-01                  110             7
+5          5       7 2025-08-01 2025-08-01                    7             1
+6          6      11 2025-08-01 2025-08-01                   34             3
+  watch_seconds
+1             3
+2             7
+3           168
+4            90
+5             5
+6            22</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sessions)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   session_id       user_id          login_at         logout_at    
- Min.   :    1   Min.   :   1   Length   :99387   Length   :99387  
- 1st Qu.:24848   1st Qu.: 710   N.unique :98353   N.unique :98317  
- Median :49694   Median :1410   N.blank  :    0   N.blank  :    0  
- Mean   :49694   Mean   :1410   Min.nchar:   20   Min.nchar:   20  
- 3rd Qu.:74541   3rd Qu.:2100   Max.nchar:   20   Max.nchar:   20  
+ Min.   :    1   Min.   :   1   Length   :99280   Length   :99280  
+ 1st Qu.:24851   1st Qu.: 710   N.unique :   60   N.unique :   60  
+ Median :49693   Median :1410   N.blank  :    0   N.blank  :    0  
+ Mean   :49693   Mean   :1410   Min.nchar:   10   Min.nchar:   10  
+ 3rd Qu.:74539   3rd Qu.:2100   Max.nchar:   10   Max.nchar:   10  
  Max.   :99387   Max.   :2813                                      
  session_duration_sec videos_viewed    watch_seconds   
  Min.   :  2.00       Min.   : 1.000   Min.   :  0.00  
  1st Qu.: 12.00       1st Qu.: 1.000   1st Qu.:  8.00  
  Median : 40.00       Median : 3.000   Median : 32.00  
- Mean   : 58.98       Mean   : 3.836   Mean   : 48.44  
+ Mean   : 59.03       Mean   : 3.839   Mean   : 48.48  
  3rd Qu.: 83.00       3rd Qu.: 5.000   3rd Qu.: 70.00  
  Max.   :666.00       Max.   :30.000   Max.   :608.00  </code></pre>
 </div>
@@ -312,7 +312,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="conclusion" class="level2">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>Most users show moderate engagement, but both videos watched and session counts are right-skewed with some highly active outliers. Clear positive correlations exist between session frequency, session duration, and the number of videos watched, highlighting that more active users tend to watch more content.</p>
+<p>Most users show moderate engagement, but both videos watched and session counts are right-skewed with some highly active outliers. Clear positive correlations exist between session frequency, session duration, and the number of videos watched, highlighting that more active users tend to watch more content</p>
 </section>
 </section>
 
