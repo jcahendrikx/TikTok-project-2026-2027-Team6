@@ -140,9 +140,9 @@ make
 - If the dataset is missing, run `make`; the Makefile will call the download script automatically.
 - If required R packages are missing, install `tidyverse` and `here`.
 - If Quarto cannot locate R, run `quarto check` to verify the installation.
-- The time-of-day analysis uses UTC timestamps. Hours 22 and 23 have incomplete date coverage and are therefore excluded from the main hourly comparison.
+- The time-of-day analysis uses UTC timestamps. Hours 22 and 23 are not represented consistently across all 60 dates and are therefore excluded from the main hourly comparison.
 - If `make` is not recognized, check that GNU Make is installed and available on the system PATH.
 
 ## AI Usage
 
-AI assistance used during the individual analysis will be documented in the project AI documentation.
+AI assistance used during the individual analysis is documented in `../../documentation/AI.md`.
