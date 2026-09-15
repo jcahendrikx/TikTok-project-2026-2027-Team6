@@ -355,7 +355,7 @@ session_summary <- session_level %>%
 
 print(session_summary, width = Inf)
 ```
-The dataset contains 25,705 user sessions. A session contains an average of 3.84 watch events, with a median of 3 events. The average observed watch time per session is 45.1 seconds, while the median is 29 seconds. The higher averages compared with the medians suggest that most sessions are relatively short, while a smaller number of longer sessions increase the overall averages.
+The dataset contains 25,705 user sessions. A session contains an average of 3.84 watch events, with a median of 3 events. The average observed watch time per session is 46.0 seconds, while the median is 30 seconds. The higher averages compared with the medians suggest that most sessions are relatively short, while a smaller number of longer sessions increase the overall averages.
 
 ### Distribution of Events per Session
 ```{r}
@@ -490,7 +490,7 @@ The watch-events dataset contains 98,702 observations across 25,705 user session
 
 Watch duration differs clearly by action. Full-watch events have the longest observed duration, while immediate skips have a watch duration of zero. Partial skips and platform exits fall between these two extremes.
 
-At the session level, users generate a median of 3 watch events and 29 seconds of observed watch time per session. Session activity is strongly right-skewed, with most sessions containing only a few watch events and a smaller number of much longer sessions.
+At the session level, users generate a median of 3 watch events and 30 seconds of observed watch time per session. Session activity is strongly right-skewed, with most sessions containing only a few watch events and a smaller number of much longer sessions.
 
 Across hours 0 through 21, which are represented on all 60 dates, watch activity and average watch duration remain relatively stable, with no strong time-of-day pattern.
 
