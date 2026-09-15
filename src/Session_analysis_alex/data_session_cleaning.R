@@ -11,23 +11,12 @@ head(sessions)
 dim(sessions) #It shows that the sessions datafile consists of only 7 columns, but almost 100,000 rows of data
 summary(sessions)
 
-
-
 #3. Checking Data Classes
 sessions %>% 
   summarise(across(everything(), class)) #All variables are the class that they are expected to be
 
-#4. Changing login_at and logout_at to actual date values
-sessions <- sessions %>%
-  mutate(login_at  = as.Date(login_at),
-         logout_at = as.Date(logout_at))
-head(sessions)
 
-  #4.1 Checking Data Classes Again
-sessions %>% 
-  summarise(across(everything(), ~list(class(.))))
-
-#5. Removing Rows with Missing Data for Critical Variables
+#4. Removing Rows with Missing Data for Critical Variables
 missing_data <- sessions %>% 
     select(session_duration_sec, videos_viewed, watch_seconds) %>% 
     summarise(across(everything (),
@@ -36,12 +25,12 @@ missing_data <- sessions %>%
 
 missing_data #So, according to this code, the three key numeric data columns do not have any missing data
 
-#6. Check for Duplicate Rows
+#5. Check for Duplicate Rows
 sessions %>%
   select(-session_id) %>%  #Is an unique identifier that needs to be removed first to check for duplicates
   janitor::get_dupes()     #Shows that there are no duplicate rows
 
-#7. Remove Duplicate Rows and Missing Data
+#6. Remove Duplicate Rows and Missing Data
 sessions_after_duplicates <- sessions %>% 
   distinct(pick(-session_id), .keep_all = TRUE) #Actually Removes the duplicates if they occur when the dataset changes in the future
 
@@ -54,6 +43,16 @@ missing_removed <- nrow(sessions_after_duplicates) - nrow(sessions_clean) #Stori
 
 cat("Duplicate rows deleted:", duplicates_removed, "\n")
 cat("Rows deleted due to missing values:", missing_removed, "\n")
+
+#7. Changing login_at and logout_at to actual date values
+sessions <- sessions %>% # Do this at the end, as otherwise watch sessions on the same date by the same user
+  mutate(login_at  = as.Date(login_at), # might mistakenly be removed for being a duplicate entry while they are not
+         logout_at = as.Date(logout_at))
+head(sessions)
+
+  #7.1 Checking Data Classes Again
+sessions %>% 
+  summarise(across(everything(), ~list(class(.))))
 
 #8. Save the cleaned file to Processed Folder
 #8.1 Create Processed Folder if Needed
