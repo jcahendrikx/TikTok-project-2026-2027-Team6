@@ -92,7 +92,9 @@ install.packages("here")
 ```
 
 ## Reproducing the Analysis
+There are Two Methods to run the Make File:
 
+### Changing Directory
 From the root folder of the repository, move to the watch-events analysis directory:
 
 ```bash
@@ -103,6 +105,17 @@ Run the complete workflow with:
 
 ```bash
 make
+```
+When this method is applied, make sure to set the current working directory back to the parent directory when trying to make git commands:
+```bash
+cd ../..
+```
+ 
+### Signaling Make Directory
+Another way to do this, is to stay in the current, main, directory, but indicate the directory of the Make file in the command:
+
+```bash
+make -C "src/watch_events_analysis"
 ```
 
 The Makefile automatically downloads `watch_events.csv` if the dataset is not already available and renders the Quarto analysis when the required inputs have changed.
