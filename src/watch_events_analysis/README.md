@@ -1,6 +1,9 @@
 # Watch Events Analysis
 
-This folder contains the individual analysis for Issue #10: **Inspect and analyze the TikTok watch events dataset**.
+This folder contains the individual analysis for Issue #10: **Inspect and analyze the TikTok watch events dataset**. 
+
+Analysis performed by: Nanyun Zhang
+Feedback given and Changes made by: Alex Hendrikx
 
 The analysis examines user watch behavior, watch duration, session-level engagement, and time-of-day activity. It also checks and normalizes the mixed timestamp formats present in the raw data.
 
