@@ -25,16 +25,22 @@ missing_data <- sessions %>%
 
 missing_data #So, according to this code, the three key numeric data columns do not have any missing data
 
-#5. Check for Duplicate Rows
-sessions %>%
-  select(-session_id) %>%  #Is an unique identifier that needs to be removed first to check for duplicates
-  janitor::get_dupes()     #Shows that there are no duplicate rows
+#5. Check for exact duplicate rows and duplicated session IDs
+exact_duplicates <- sessions %>%
+  janitor::get_dupes()
 
-#6. Remove Duplicate Rows and Missing Data
-sessions_after_duplicates <- sessions %>% 
-  distinct(pick(-session_id), .keep_all = TRUE) #Actually Removes the duplicates if they occur when the dataset changes in the future
+duplicate_session_ids <- sessions %>%
+  count(session_id, name = "session_id_count") %>%
+  filter(session_id_count > 1)
 
-duplicates_removed <- nrow(sessions) - nrow(sessions_after_duplicates) #Storing the difference to show how many rows were removed because of duplicates
+exact_duplicates
+duplicate_session_ids
+
+#6. Remove only exact duplicate rows and missing data
+sessions_after_duplicates <- sessions %>%
+  distinct()
+
+duplicates_removed <- nrow(sessions) - nrow(sessions_after_duplicates)
 
 sessions_clean <- sessions_after_duplicates %>%
   drop_na(session_duration_sec, videos_viewed, watch_seconds) #Actually Removes the missing data if they occur when the dataset changes in the future
@@ -44,14 +50,25 @@ missing_removed <- nrow(sessions_after_duplicates) - nrow(sessions_clean) #Stori
 cat("Duplicate rows deleted:", duplicates_removed, "\n")
 cat("Rows deleted due to missing values:", missing_removed, "\n")
 
-#7. Changing login_at and logout_at to actual date values
-sessions <- sessions %>% # Do this at the end, as otherwise watch sessions on the same date by the same user
-  mutate(login_at  = as.Date(login_at), # might mistakenly be removed for being a duplicate entry while they are not
-         logout_at = as.Date(logout_at))
-head(sessions)
+#7. Convert login and logout timestamps after duplicate removal
+sessions_clean <- sessions_clean %>%
+  mutate(
+    login_at = as.POSIXct(
+      login_at,
+      format = "%Y-%m-%dT%H:%M:%SZ",
+      tz = "UTC"
+    ),
+    logout_at = as.POSIXct(
+      logout_at,
+      format = "%Y-%m-%dT%H:%M:%SZ",
+      tz = "UTC"
+    )
+  )
 
-  #7.1 Checking Data Classes Again
-sessions %>% 
+head(sessions_clean)
+
+#7.1 Check data classes again
+sessions_clean %>%
   summarise(across(everything(), ~list(class(.))))
 
 #8. Save the cleaned file to Processed Folder

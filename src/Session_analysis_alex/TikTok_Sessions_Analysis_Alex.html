@@ -64,17 +64,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="Tiktok_Sessions_Analysis_Alex_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Tiktok_Sessions_Analysis_Alex_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="Tiktok_Sessions_Analysis_Alex_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="Tiktok_Sessions_Analysis_Alex_files/libs/quarto-html/popper.min.js"></script>
-<script src="Tiktok_Sessions_Analysis_Alex_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="Tiktok_Sessions_Analysis_Alex_files/libs/quarto-html/anchor.min.js"></script>
-<link href="Tiktok_Sessions_Analysis_Alex_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Tiktok_Sessions_Analysis_Alex_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="Tiktok_Sessions_Analysis_Alex_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="Tiktok_Sessions_Analysis_Alex_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Tiktok_Sessions_Analysis_Alex_files/libs/bootstrap/bootstrap-215b371544c282197b31c8aa00ce3677.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="TikTok_Sessions_Analysis_Alex_files/libs/clipboard/clipboard.min.js"></script>
+<script src="TikTok_Sessions_Analysis_Alex_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="TikTok_Sessions_Analysis_Alex_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="TikTok_Sessions_Analysis_Alex_files/libs/quarto-html/popper.min.js"></script>
+<script src="TikTok_Sessions_Analysis_Alex_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="TikTok_Sessions_Analysis_Alex_files/libs/quarto-html/anchor.min.js"></script>
+<link href="TikTok_Sessions_Analysis_Alex_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="TikTok_Sessions_Analysis_Alex_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="TikTok_Sessions_Analysis_Alex_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="TikTok_Sessions_Analysis_Alex_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="TikTok_Sessions_Analysis_Alex_files/libs/bootstrap/bootstrap-215b371544c282197b31c8aa00ce3677.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -125,7 +125,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>here() starts at C:/Users/alexh/OneDrive/Documents/Research Master/Year 2/Semester 1/Data Preparation and Programing/TeamAssignment/TikTok-project-2026-2027-Team6</code></pre>
+<pre><code>here() starts at D:/0 research master/Year 2 1a/Data Preparation and Programming Skills/IndividualAssignment/TikTok-project-2026-2027-Team6</code></pre>
 </div>
 </div>
 <p>For this analysis, the following packages are needed: 1. tidyverse, 2. here</p>
@@ -203,7 +203,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Tiktok_Sessions_Analysis_Alex_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TikTok_Sessions_Analysis_Alex_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -234,7 +234,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Tiktok_Sessions_Analysis_Alex_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TikTok_Sessions_Analysis_Alex_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -247,7 +247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="scatter-plot-sessions-and-video-watched-per-user" class="level2">
 <h2 class="anchored" data-anchor-id="scatter-plot-sessions-and-video-watched-per-user">6. Scatter Plot Sessions and Video Watched per User</h2>
-<p>A similar distribution is seen in the above two graph, suggesting correlation and potentially causation between Number of Sessions and Videos Watched per User. Therefore a scatter plot will be performed to view this possible correlation.</p>
+<p>A similar distribution is seen in the two graphs above, suggesting a possible association between the number of sessions and videos watched per user. Therefore, a scatter plot will be used to examine this relationship further.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>user_summary <span class="ot">&lt;-</span> sessions <span class="sc">%&gt;%</span> <span class="co">#Recreate the two variables as they both existed in seperate stored dataframes</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(user_id) <span class="sc">%&gt;%</span></span>
@@ -272,7 +272,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Tiktok_Sessions_Analysis_Alex_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TikTok_Sessions_Analysis_Alex_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -298,7 +298,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Tiktok_Sessions_Analysis_Alex_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="TikTok_Sessions_Analysis_Alex_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>

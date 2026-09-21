@@ -80,7 +80,7 @@ ggsave(here("output", "week3", "histogram_sessions_per_user.png"))
 This histogram shows the distribution of total watch sessions per user. Most users had around 30 watch sessions, but there are several users with total watch sessions exceeding 80, resulting in a right-skewed distribution, rather than a symmaterical normal distribution. 
 
 ## 6. Scatter Plot Sessions and Video Watched per User
-A similar distribution is seen in the above two graph, suggesting correlation and potentially causation between Number of Sessions and Videos Watched per User. Therefore a scatter plot will be performed to view this possible correlation.
+A similar distribution is seen in the two graphs above, suggesting a possible association between the number of sessions and videos watched per user. Therefore, a scatter plot will be used to examine this relationship further.
 
 ```{r}
 user_summary <- sessions %>% #Recreate the two variables as they both existed in seperate stored dataframes
