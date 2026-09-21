@@ -1,5 +1,5 @@
 # Convenience target so "make" runs all downstream outputs rather than only the first line of the Makefile
-all: src/Session_analysis_alex/Tiktok_Sessions_Analysis_Alex.html
+all: src/Session_analysis_alex/TikTok_Sessions_Analysis_Alex.html
 
 # Download raw data if it doesn't exist
 # Only runs if the CSV is missing or the script changes
@@ -13,7 +13,11 @@ data/data_session/processed/cleaned_sessions.csv: src/Session_analysis_alex/data
 
 # Render the Quarto analysis report
 # Only runs if the source .qmd or processed data changes
-src/Session_analysis_alex/Tiktok_Sessions_Analysis_Alex.html: src/Session_analysis_alex/Tiktok_Sessions_Analysis_Alex.qmd data/data_session/processed/cleaned_sessions.csv
-	quarto render src/Session_analysis_alex/Tiktok_Sessions_Analysis_Alex.qmd
+src/Session_analysis_alex/TikTok_Sessions_Analysis_Alex.html: src/Session_analysis_alex/TikTok_Sessions_Analysis_Alex.qmd data/data_session/processed/cleaned_sessions.csv
+	quarto render src/Session_analysis_alex/TikTok_Sessions_Analysis_Alex.qmd
 
-.PHONY: all
+# Remove generated intermediate data and plot outputs so the workflow can be rebuilt
+clean:
+	Rscript -e "unlink('data/data_session/processed/cleaned_sessions.csv'); unlink('output/week3', recursive = TRUE)"
+
+.PHONY: all clean
