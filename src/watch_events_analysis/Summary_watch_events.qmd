@@ -99,14 +99,13 @@ ggsave(
   height = 5
 )
 ```
-The four watch actions occur at very similar frequencies. `exit_platform` is the most common action at 25.9%, followed by `watch_full` at 25.3%, while `skip_after_partial` and `skip_immediate` account for 24.5% and 24.3%, respectively. Overall, no single action strongly dominates the watch events.
+The four watch actions occur at very similar frequencies. As rows with missing data for watch_seconds were removed, except for those with the action `skip_immediate`, which were logically set to 0, `skip_immediate` is the most common action within the cleaned dataset with 25.8% of all rows. `exit_platform` is the second most common action at 25.5%, followed by `watch_full` at 25.7%, while `skip_after_partial` accounts for 24%. Overall, no single action strongly dominates the watch events.
 
 ## 5. Watch Time by Action
 ```{r}
 #| label: watch-time-summary
 
 watch_time_summary <- watch_events %>%
-  filter(!is.na(watch_seconds)) %>%
   group_by(action) %>%
   summarise(
     number_of_observations = n(),
@@ -119,14 +118,12 @@ watch_time_summary <- watch_events %>%
 
 watch_time_summary
 ```
-Watch duration is summarized separately for each user action. Observations with missing `watch_seconds` are excluded only from this analysis, following the missing-value assessment above.
-
+Watch duration is summarized separately for each user action. 
 ```{r}
 #| label: fig-watch-time-by-action
 #| fig-cap: "Distribution of watch duration across the four user actions."
 
 watch_time_plot <- watch_events %>%
-  filter(!is.na(watch_seconds)) %>%
   ggplot(
     aes(
       x = action,
@@ -205,7 +202,7 @@ session_summary <- session_level %>%
 
 print(session_summary, width = Inf)
 ```
-The dataset contains 25,705 user sessions. A session contains an average of 3.84 watch events, with a median of 3 events. The average observed watch time per session is 46.0 seconds, while the median is 30 seconds. The higher averages compared with the medians suggest that most sessions are relatively short, while a smaller number of longer sessions increase the overall averages.
+The cleaned dataset contains 25,202 user sessions. A session contains an average of 3.7 watch events, with a median of 3 events. The average observed watch time per session is 46.0 seconds, while the median is 30 seconds. The higher averages compared with the medians suggest that most sessions are relatively short, while a smaller number of longer sessions increase the overall averages.
 
 ### Distribution of Events per Session
 ```{r}
@@ -329,19 +326,18 @@ ggsave(
   width = 8,
   height = 5
 )
+
 ```
-Across the fully observed hours from 00:00 to 21:00 UTC, watch activity remains relatively stable, with approximately 4,100 to 4,800 events per hour. Although some local peaks and dips are visible, there is no strong overall time-of-day pattern. Average watch duration is also highly consistent across hours, remaining close to 12–13 seconds.
+Across the fully observed hours from 00:00 to 21:00 UTC, watch activity remains relatively stable, with approximately 3,900 to 4,500 events per hour. Although some local peaks and dips are visible, there is no strong overall time-of-day pattern. Average watch duration is also highly consistent across hours, remaining close to 12–13 seconds.
 
 Hours 22 and 23 are not included in the main comparison because they are not represented consistently across the 60 dates. Their lower event counts therefore should not be interpreted directly as evidence of lower user activity.
 
 ## 8. Conclusion
 
-The watch-events dataset contains 98,702 observations across 25,705 user sessions. The four watch actions occur at similar frequencies, with no single action dominating the dataset.
+The cleaned watch-events dataset contains 93,211 observations across 25,705 user sessions. The four watch actions occur at similar frequencies, with no single action dominating the dataset.
 
 Watch duration differs clearly by action. Full-watch events have the longest observed duration, while immediate skips have a watch duration of zero. Partial skips and platform exits fall between these two extremes.
 
 At the session level, users generate a median of 3 watch events and 30 seconds of observed watch time per session. Session activity is strongly right-skewed, with most sessions containing only a few watch events and a smaller number of much longer sessions.
 
 Across hours 0 through 21, which are represented on all 60 dates, watch activity and average watch duration remain relatively stable, with no strong time-of-day pattern.
-
-The analysis also identified mixed timestamp formats in the raw data. These timestamps were successfully normalized into a consistent datetime format, with all 98,702 normalized timestamps matching the existing parsed timestamps.

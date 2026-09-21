@@ -65,7 +65,7 @@ The dataset is downloaded automatically by `download_watch_events.R`. The local 
 
 The data cleaning is performed in `clean_watch_events.R` and checks for missing values and timestamp formats.
 
-Missing `watch_seconds` values are retained when the analysis does not require watch duration and are excluded only from calculations that directly use `watch_seconds`.
+Missing values are checked and found in the raw dataset for `watch_seconds`. For the rows with the action `skip_immediate` that have a missing value for `watch_seconds`, the missing values were replaced with a 0, as the watch duration is 0 by principle. For all other actions and missing data for all other variables, rows are automatically removed in the cleaning process. This part of the cleaning process changes the total observations from 97,702 to 93,211.
 
 The raw start timestamps contain multiple formats, including ISO 8601 timestamps, compact date-time strings, and UNIX timestamps. These values are normalized into a consistent datetime variable and validated against the existing parsed timestamp.
 

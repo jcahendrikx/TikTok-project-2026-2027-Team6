@@ -23,7 +23,7 @@ cat("\n--- Initial Data Structure ---\n")
 head(watch_events)
 glimpse(watch_events)
 
-# 3. ASSESS MISSING VALUES 
+# 3. ASSESS AND HANDLE MISSING VALUES 
 
 # Overall missing values by column
 missing_values <- watch_events %>%
@@ -51,9 +51,43 @@ missing_watch_time <- watch_events %>%
 cat("\n--- Missing watch_seconds by Action ---\n")
 print(missing_watch_time)
 
-cat("\nDecision: ~7% missing uniformly across actions.\n")
-cat("Retain all observations for this cleaning script.\n")
-cat("Analysis document will exclude NAs only from watch-duration analyses.\n")
+cat("\n Observation: ~7% missing uniformly across actions.\n")
+
+# As immediate skips are always equal to 0 watch seconds, change all missing values where action = skip_immediate to 0
+watch_events <- watch_events %>%
+  mutate(
+    watch_seconds = case_when(
+      action == "skip_immediate" & is.na(watch_seconds) ~ 0,
+      TRUE ~ watch_seconds
+    )
+  )
+
+# Checking Missing Watch Time per Action Again 
+missing_watch_time <- watch_events %>%
+  group_by(action) %>%
+  summarise(
+    number_of_events = n(),
+    missing_watch_seconds = sum(is.na(watch_seconds)),
+    missing_percentage = mean(is.na(watch_seconds)) * 100,
+    .groups = "drop"
+  ) %>%
+  arrange(desc(missing_percentage))
+
+cat("\n--- Missing watch_seconds by Action After Changing Skip Immediate NA's to 0's---\n")
+print(missing_watch_time)
+
+# All Rows with Missing Data in Any Variable Will be Removed, As They Are All Key to the Analysis
+cat("\n--- Delete Rows with Missing Values for Any Variable---\n")
+
+n_before <- nrow(watch_events)
+
+watch_events <- watch_events %>% drop_na()
+
+n_after <- nrow(watch_events)
+
+cat(sprintf("Rows removed: %d (%.2f%% of original data)\n", 
+            n_before - n_after, 
+            (n_before - n_after) / n_before * 100))
 
 # 4. INVESTIGATE MIXED TIMESTAMP FORMATS
 
