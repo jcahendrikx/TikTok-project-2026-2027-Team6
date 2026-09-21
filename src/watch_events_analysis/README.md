@@ -69,6 +69,8 @@ Missing `watch_seconds` values are retained when the analysis does not require w
 
 The raw start timestamps contain multiple formats, including ISO 8601 timestamps, compact date-time strings, and UNIX timestamps. These values are normalized into a consistent datetime variable and validated against the existing parsed timestamp.
 
+After the datetime normalization has taken place, the data is checked for duplicate entries, excluding the impression_id and watch_event_id variables, as they are unique for each entry. Duplicate values are then automatically removed from the dataset and a message is shown how many of these are deleted.
+
 The cleaned dataset is saved as `watch_events_cleaned.csv` and serves as the input for the analysis document.
 
 ## Analysis

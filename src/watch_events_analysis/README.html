@@ -138,6 +138,7 @@ hourly_watch_activity.png</code></pre>
 <p>The data cleaning is performed in <code>clean_watch_events.R</code> and checks for missing values and timestamp formats.</p>
 <p>Missing <code>watch_seconds</code> values are retained when the analysis does not require watch duration and are excluded only from calculations that directly use <code>watch_seconds</code>.</p>
 <p>The raw start timestamps contain multiple formats, including ISO 8601 timestamps, compact date-time strings, and UNIX timestamps. These values are normalized into a consistent datetime variable and validated against the existing parsed timestamp.</p>
+<p>After the datetime normalization has taken place, the data is checked for duplicate entries, excluding the impression_id and watch_event_id variables, as they are unique for each entry. Duplicate values are then automatically removed from the dataset and a message is shown how many of these are deleted.</p>
 <p>The cleaned dataset is saved as <code>watch_events_cleaned.csv</code> and serves as the input for the analysis document.</p>
 </section>
 <section id="analysis" class="level2">

@@ -169,7 +169,36 @@ if (timestamp_comparison$non_matching_timestamps[1] == 0) {
   warning("Normalized timestamps do NOT match started_at. Review conversion logic.")
 }
 
-# 7. SAVE CLEANED DATASET
+# 7. CHECK FOR AND REMOVE DUPLICATE ENTRIES 
+
+cat("\n--- Checking for Duplicate Entries ---\n")
+
+# Count rows before duplicate removal
+total_rows_before <- nrow(watch_events)
+
+# Create a duplicate check dataset excluding watch_events_id and impression_id (as they are unique for each entry)
+watch_events <- watch_events %>%
+  distinct(
+    across(-c(watch_event_id, impression_id)),
+    .keep_all = TRUE
+  )
+
+# Count rows after duplicate removal
+total_rows_after <- nrow(watch_events)
+duplicate_count <- total_rows_before - total_rows_after
+
+cat(glue::glue("\nTotal observations before duplicate removal: {total_rows_before}\n"))
+cat(glue::glue("Total observations after duplicate removal: {total_rows_after}\n"))
+cat(glue::glue("Duplicate observations removed: {duplicate_count}\n"))
+
+if (duplicate_count > 0) {
+  cat(glue::glue("\n✓ Removed {duplicate_count} duplicate entries (excluding watch_events_id and impression_id).\n"))
+} else {
+  cat("\n✓ No duplicate entries found (excluding watch_events_id and impression_id).\n")
+}
+
+
+# 8. SAVE CLEANED DATASET
 
 output_dir <- here("data", "watch_events", "cleaned")
 
