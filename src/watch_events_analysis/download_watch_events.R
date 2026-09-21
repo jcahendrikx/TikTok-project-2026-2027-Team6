@@ -4,7 +4,8 @@ library(here)
 
 data_dir <- here(
   "data",
-  "watch_events"
+  "watch_events",
+  "raw"
 )
 
 dir.create(

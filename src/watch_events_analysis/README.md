@@ -21,15 +21,21 @@ The analysis focuses on:
 The main files used for this analysis are:
 
 - `download_watch_events.R` — downloads the watch events dataset into the project data folder.
-- `Summary_watch_events.qmd` — contains the data inspection, cleaning, analysis, and visualizations.
+- `clean_watch_events.R` - contains the data inspection and cleaning
+- `Summary_watch_events.qmd` — contains the data analysis and visualizations.
 - `Summary_watch_events.html` — rendered HTML report generated from the Quarto document.
 - `makefile` — automates data downloading and report generation based on file dependencies.
 - `README.md` — provides instructions for reproducing the analysis.
 
-The downloaded dataset is stored in:
+The downloaded raw dataset is stored in:
 
 ```text
-data/watch_events/watch_events.csv
+data/watch_events/raw/watch_events.csv
+```
+
+The cleaned dataset is stored in:
+```text
+data/watch_events/cleaned/watch_events_cleaned.csv
 ```
 
 Generated figures are stored in:
@@ -38,7 +44,7 @@ Generated figures are stored in:
 output/watch_events/
 ```
 
-The figures currently include:
+The figures include:
 
 ```text
 action_distribution.png
@@ -57,15 +63,17 @@ The dataset is downloaded automatically by `download_watch_events.R`. The local 
 
 ## Data Preparation
 
-The analysis includes checks for missing values and timestamp formats.
+The data cleaning is performed in `clean_watch_events.R` and checks for missing values and timestamp formats.
 
 Missing `watch_seconds` values are retained when the analysis does not require watch duration and are excluded only from calculations that directly use `watch_seconds`.
 
 The raw start timestamps contain multiple formats, including ISO 8601 timestamps, compact date-time strings, and UNIX timestamps. These values are normalized into a consistent datetime variable and validated against the existing parsed timestamp.
 
+The cleaned dataset is saved as `watch_events_cleaned.csv` and serves as the input for the analysis document.
+
 ## Analysis
 
-The Quarto report contains four main behavioral analyses:
+The Quarto report (`Summary_watch_events.qmd`) contains four main behavioral analyses:
 
 1. **Distribution of Watch Actions** — compares how frequently the four user actions occur.
 2. **Watch Time by Action** — compares watch duration across different user actions.

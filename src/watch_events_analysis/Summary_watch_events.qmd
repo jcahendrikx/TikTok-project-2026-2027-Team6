@@ -15,7 +15,7 @@ library(tidyverse)
 library(here)
 
 watch_events <- read_csv(
-  here("data", "watch_events", "watch_events.csv"),
+  here("data", "watch_events", "cleaned", "watch_events_cleaned.csv"),
   show_col_types = FALSE
 )
 ```
@@ -30,157 +30,7 @@ glimpse(watch_events)
 ```
 This section provides a first look at the structure and contents of the watch events dataset, including the available variables and their data types.
 
-## 3. Missing Values Check
-```{r}
-#| label: missing-values-check
-
-missing_values <- watch_events %>%
-  summarise(
-    across(
-      everything(),
-      ~ sum(is.na(.))
-    )
-  )
-
-missing_values
-```
-This check shows how many missing values are present in each variable in the watch events dataset.
-
-### Missing Watch Time by Action
-```{r}
-#| label: missing-watch-time-by-action
-
-missing_watch_time <- watch_events %>%
-  group_by(action) %>%
-  summarise(
-    number_of_events = n(),
-    missing_watch_seconds = sum(is.na(watch_seconds)),
-    missing_percentage = mean(is.na(watch_seconds)) * 100
-  ) %>%
-  arrange(desc(missing_percentage))
-
-missing_watch_time
-```
-The proportion of missing `watch_seconds` values is similar across all four action categories, ranging from approximately 7.1% to 7.7%. This suggests that the missing values are not strongly concentrated within one specific type of user action. Therefore, all observations are retained for analyses of action frequencies, while observations with missing `watch_seconds` are excluded only from analyses that directly use watch duration.
-
-## 4. Timestamp Format Check
-```{r}
-#| label: timestamp-format-check
-
-timestamp_formats <- watch_events %>%
-  mutate(
-    timestamp_format = case_when(
-      str_detect(started_at_raw, "^\\d{8} \\d{6}$") ~ "YYYYMMDD HHMMSS",
-      str_detect(started_at_raw, "^\\d{4}-\\d{2}-\\d{2}T") ~ "ISO 8601",
-      TRUE ~ "Other"
-    )
-  ) %>%
-  count(timestamp_format, sort = TRUE)
-
-timestamp_formats
-```
-The raw start timestamps were exported in multiple formats. This check identifies the main timestamp formats before converting them into a consistent datetime representation.
-
-### Inspect Other Timestamp Formats
-```{r}
-#| label: inspect-other-timestamps
-
-other_timestamps <- watch_events %>%
-  filter(
-    !str_detect(started_at_raw, "^\\d{8} \\d{6}$"),
-    !str_detect(started_at_raw, "^\\d{4}-\\d{2}-\\d{2}T")
-  ) %>%
-  distinct(started_at_raw) %>%
-  head(20)
-
-other_timestamps
-```
-The remaining timestamps do not match either of the two main formats identified above. A sample is inspected before deciding how these values should be converted.
-
-```{r}
-#| label: other-timestamp-lengths
-watch_events %>%
-  filter(
-    !str_detect(started_at_raw, "^\\d{8} \\d{6}$"),
-    !str_detect(started_at_raw, "^\\d{4}-\\d{2}-\\d{2}T")
-  ) %>%
-  mutate(
-    character_length = str_length(started_at_raw)
-  ) %>%
-  count(character_length, sort = TRUE)
-```
-This check compares the character lengths of the remaining timestamp values, which can help identify additional timestamp formats. All remaining raw timestamp values are 10-digit numeric strings. These values are therefore interpreted as UNIX timestamps in seconds, with the conversion validated against the existing `started_at` variable below.
-
-## 5. Normalize Mixed Timestamps
-```{r}
-#| label: normalize-timestamps
-watch_events <- watch_events %>%
-  mutate(
-    text_timestamp = if_else(
-      str_detect(started_at_raw, "^\\d{4}-\\d{2}-\\d{2}T") |
-        str_detect(started_at_raw, "^\\d{8} \\d{6}$"),
-      started_at_raw,
-      NA_character_
-    ),
-    
-    unix_timestamp = if_else(
-      str_detect(started_at_raw, "^\\d{10}$"),
-      started_at_raw,
-      NA_character_
-    ),
-    
-    started_at_normalized = coalesce(
-      ymd_hms(
-        text_timestamp,
-        tz = "UTC"
-      ),
-      as.POSIXct(
-        as.numeric(unix_timestamp),
-        origin = "1970-01-01",
-        tz = "UTC"
-      )
-    )
-  ) %>%
-  select(
-    -text_timestamp,
-    -unix_timestamp
-  )
-```
-
-```{r}
-#| label: check-normalized-timestamps
-
-timestamp_check <- watch_events %>%
-  summarise(
-    total_observations = n(),
-    missing_raw = sum(is.na(started_at_raw)),
-    missing_normalized = sum(is.na(started_at_normalized))
-  )
-
-timestamp_check
-```
-
-```{r}
-#| label: compare-normalized-timestamps
-
-timestamp_comparison <- watch_events %>%
-  summarise(
-    matching_timestamps = sum(
-      started_at == started_at_normalized,
-      na.rm = TRUE
-    ),
-    non_matching_timestamps = sum(
-      started_at != started_at_normalized,
-      na.rm = TRUE
-    )
-  )
-
-timestamp_comparison
-```
-
-All 98,702 raw timestamps were successfully converted, with no missing normalized values. The normalized timestamps also match the existing `started_at` variable for every observation, confirming that the three raw timestamp formats were interpreted correctly.
-
-## 6. Summary Statistics
+## 3. Summary Statistics
 ```{r}
 #| label: summary-statistics
 
@@ -199,7 +49,7 @@ print(watch_summary, width = Inf)
 ```
 The dataset contains 98,702 watch events from 724 users across 25,705 sessions, covering 4,216 videos from 218 creators. Among observations with available watch duration, the average watch time is 12.7 seconds and the median is 9 seconds. The higher mean compared with the median suggests that some longer watch events increase the average duration.
 
-## 7. Distribution of Watch Actions
+## 4. Distribution of Watch Actions
 ```{r}
 #| label: fig-action-distribution
 #| fig-cap: "Distribution of user actions across all watch events."
@@ -251,7 +101,7 @@ ggsave(
 ```
 The four watch actions occur at very similar frequencies. `exit_platform` is the most common action at 25.9%, followed by `watch_full` at 25.3%, while `skip_after_partial` and `skip_immediate` account for 24.5% and 24.3%, respectively. Overall, no single action strongly dominates the watch events.
 
-## 8. Watch Time by Action
+## 5. Watch Time by Action
 ```{r}
 #| label: watch-time-summary
 
@@ -311,7 +161,7 @@ ggsave(
 ```
 Watch duration differs substantially across the four user actions. `watch_full` events have the longest watch duration, with an average of 30.1 seconds and a median of 30 seconds. `skip_after_partial` events have an average duration of 14.4 seconds, while `exit_platform` events average 6.07 seconds. As expected, `skip_immediate` events have a watch duration of 0 seconds. Overall, the watch-duration patterns are clearly consistent with the different types of user action.
 
-## 9. Session-Level Engagement
+## 6. Session-Level Engagement
 ```{r}
 #| label: session-level-summary
 
@@ -392,7 +242,7 @@ ggsave(
 ```
 Most user sessions contain only a small number of watch events, with one-event sessions occurring most frequently. The number of sessions decreases rapidly as the number of watch events increases, producing a strongly right-skewed distribution. A relatively small number of sessions contain many watch events, which helps explain why the average number of events per session is higher than the median.
 
-## 10. Time-of-Day Behavior
+## 7. Time-of-Day Behavior
 ```{r}
 #| label: hourly-activity-summary
 hourly_activity <- watch_events %>%
@@ -484,7 +334,7 @@ Across the fully observed hours from 00:00 to 21:00 UTC, watch activity remains 
 
 Hours 22 and 23 are not included in the main comparison because they are not represented consistently across the 60 dates. Their lower event counts therefore should not be interpreted directly as evidence of lower user activity.
 
-## 11. Conclusion
+## 8. Conclusion
 
 The watch-events dataset contains 98,702 observations across 25,705 user sessions. The four watch actions occur at similar frequencies, with no single action dominating the dataset.
 

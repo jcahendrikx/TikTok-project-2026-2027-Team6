@@ -1,0 +1,181 @@
+# ============================================================================
+# Data Cleaning Script: TikTok Watch Events
+# ============================================================================
+# Purpose: Load raw data, handle mixed timestamp formats, validate data 
+#          quality, and save cleaned dataset
+#
+# Output: data/watch_events_cleaned/cleaned/watch_events_cleaned.csv
+# ============================================================================
+
+library(tidyverse)
+library(here)
+
+# 1. LOAD DATA 
+
+watch_events <- read_csv(
+  here("data", "watch_events", "raw", "watch_events.csv"),
+  show_col_types = FALSE
+)
+
+# 2. INSPECT DATA STRUCTURE
+
+cat("\n--- Initial Data Structure ---\n")
+head(watch_events)
+glimpse(watch_events)
+
+# 3. ASSESS MISSING VALUES 
+
+# Overall missing values by column
+missing_values <- watch_events %>%
+  summarise(
+    across(
+      everything(),
+      ~ sum(is.na(.))
+    )
+  )
+
+cat("\n--- Missing Values by Column ---\n")
+print(missing_values)
+
+# Missing watch_seconds by action
+missing_watch_time <- watch_events %>%
+  group_by(action) %>%
+  summarise(
+    number_of_events = n(),
+    missing_watch_seconds = sum(is.na(watch_seconds)),
+    missing_percentage = mean(is.na(watch_seconds)) * 100,
+    .groups = "drop"
+  ) %>%
+  arrange(desc(missing_percentage))
+
+cat("\n--- Missing watch_seconds by Action ---\n")
+print(missing_watch_time)
+
+cat("\nDecision: ~7% missing uniformly across actions.\n")
+cat("Retain all observations for this cleaning script.\n")
+cat("Analysis document will exclude NAs only from watch-duration analyses.\n")
+
+# 4. INVESTIGATE MIXED TIMESTAMP FORMATS
+
+# Identify timestamp formats in raw data
+timestamp_formats <- watch_events %>%
+  mutate(
+    timestamp_format = case_when(
+      str_detect(started_at_raw, "^\\d{8} \\d{6}$") ~ "YYYYMMDD HHMMSS",
+      str_detect(started_at_raw, "^\\d{4}-\\d{2}-\\d{2}T") ~ "ISO 8601",
+      TRUE ~ "Other"
+    )
+  ) %>%
+  count(timestamp_format, sort = TRUE)
+
+cat("\n--- Timestamp Format Distribution ---\n")
+print(timestamp_formats)
+
+# Inspect "Other" timestamps
+other_timestamps <- watch_events %>%
+  filter(
+    !str_detect(started_at_raw, "^\\d{8} \\d{6}$"),
+    !str_detect(started_at_raw, "^\\d{4}-\\d{2}-\\d{2}T")
+  ) %>%
+  distinct(started_at_raw) %>%
+  head(20)
+
+cat("\n--- Sample of 'Other' Timestamp Formats ---\n")
+print(other_timestamps)
+
+# Analyze character lengths of remaining timestamps
+other_length_dist <- watch_events %>%
+  filter(
+    !str_detect(started_at_raw, "^\\d{8} \\d{6}$"),
+    !str_detect(started_at_raw, "^\\d{4}-\\d{2}-\\d{2}T")
+  ) %>%
+  mutate(character_length = str_length(started_at_raw)) %>%
+  count(character_length, sort = TRUE)
+
+cat("\n--- Character Length Distribution of 'Other' Timestamps ---\n")
+print(other_length_dist)
+
+cat("\nInterpretation: All remaining values are 10-digit numeric strings.\n")
+cat("These are interpreted as UNIX timestamps (seconds since 1970-01-01).\n")
+
+# 5. NORMALIZE MIXED TIMESTAMP FORMATS
+
+watch_events <- watch_events %>%
+  mutate(
+    
+# Separate timestamp strings by format
+    text_timestamp = if_else(
+      str_detect(started_at_raw, "^\\d{4}-\\d{2}-\\d{2}T") |
+        str_detect(started_at_raw, "^\\d{8} \\d{6}$"),
+      started_at_raw,
+      NA_character_
+    ),
+    
+    unix_timestamp = if_else(
+      str_detect(started_at_raw, "^\\d{10}$"),
+      started_at_raw,
+      NA_character_
+    ),
+    
+    
+# Parse both formats and coalesce to single datetime
+    started_at_normalized = coalesce(
+      ymd_hms(text_timestamp, tz = "UTC"),
+      as.POSIXct(
+        as.numeric(unix_timestamp),
+        origin = "1970-01-01",
+        tz = "UTC"
+      )
+    )
+  ) %>%
+  
+# Remove temporary columns
+  select(-text_timestamp, -unix_timestamp)
+
+cat("\n--- Timestamp Normalization Complete ---\n")
+
+# 6. VALIDATE TIMESTAMP NORMALIZATION 
+
+# Check for successful conversion
+timestamp_check <- watch_events %>%
+  summarise(
+    total_observations = n(),
+    missing_raw = sum(is.na(started_at_raw)),
+    missing_normalized = sum(is.na(started_at_normalized))
+  )
+
+cat("\nTimestamp normalization check:\n")
+print(timestamp_check)
+
+# Verify normalized timestamps match existing parsed timestamps
+timestamp_comparison <- watch_events %>%
+  summarise(
+    matching_timestamps = sum(
+      started_at == started_at_normalized,
+      na.rm = TRUE
+    ),
+    non_matching_timestamps = sum(
+      started_at != started_at_normalized,
+      na.rm = TRUE
+    )
+  )
+
+cat("\nComparison with existing started_at variable:\n")
+print(timestamp_comparison)
+
+if (timestamp_comparison$non_matching_timestamps[1] == 0) {
+  cat("\n✓ All normalized timestamps match the existing started_at variable.\n")
+} else {
+  warning("Normalized timestamps do NOT match started_at. Review conversion logic.")
+}
+
+# 7. SAVE CLEANED DATASET
+
+output_dir <- here("data", "watch_events", "cleaned")
+
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+write_csv(
+  watch_events,
+  here(output_dir, "watch_events_cleaned.csv")
+)
