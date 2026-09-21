@@ -71,13 +71,19 @@ dir.create(
 )
 
 action_plot <- ggplot(
-  action_summary,
-  aes(
-    x = reorder(action, n),
-    y = n
-  )
+  action_summary %>%
+    mutate(
+      action = forcats::fct_recode(
+        action,
+        "Skip Immediate" = "skip_immediate",
+        "Skip After Partial" = "skip_after_partial",
+        "Watch Full" = "watch_full",
+        "Exit Platform" = "exit_platform"
+      )
+    ),
+  aes(x = reorder(action, n), y = n)
 ) +
-  geom_col() +
+  geom_col(fill = "lightblue") +
   coord_flip() +
   labs(
     title = "Distribution of Watch Event Actions",
@@ -215,7 +221,10 @@ session_events_plot <- ggplot(
 ) +
   geom_histogram(
     binwidth = 1,
-    boundary = 0
+    boundary = 0,
+    fill = "#87CEEB",
+    color = "black"  
+# Optional: adds a border to bins
   ) +
   labs(
     title = "Number of Watch Events per Session",
@@ -284,7 +293,8 @@ hourly_date_coverage <- watch_events %>%
   ) %>%
   arrange(hour)
 
-print(hourly_date_coverage, n = Inf, width = Inf)
+print(hourly_date_coverage, n = Inf, index = FALSE)
+
 ```
 Hours 0 through 21 are represented on all 60 dates in the dataset. In contrast, hour 22 appears on only 58 dates and contains substantially fewer events, while hour 23 is absent entirely. Because the dataset alone does not indicate whether this pattern reflects user behavior or the observation process, hours 22 and 23 are excluded from the main time-of-day comparison.
 
@@ -326,7 +336,6 @@ ggsave(
   width = 8,
   height = 5
 )
-
 ```
 Across the fully observed hours from 00:00 to 21:00 UTC, watch activity remains relatively stable, with approximately 3,900 to 4,500 events per hour. Although some local peaks and dips are visible, there is no strong overall time-of-day pattern. Average watch duration is also highly consistent across hours, remaining close to 12–13 seconds.
 
