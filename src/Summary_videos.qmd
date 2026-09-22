@@ -93,4 +93,4 @@ head(time_between_impressions)
 The above code first filters out videos with missing values for first and last impressions, then calculates the difference between the two, transforms this into hours and days, and finally arranges from largest gap between impressions to the smallest gap between first and last impressions.
 
 # Conclusion
-Overall, the analysis provides an overview of the TikTok video view dataset, including missing values, creator performance, publishing dates, impression duration, and the videos with the highest impressions. These summaries help identify differences in reach, engagement, and the timing of impressions across videos.
+Overall, the analysis provides an overview of the TikTok video view dataset, including missing values, creator performance, publishing dates, impression duration, and the videos with the highest impressions. These summaries help identify differences in reach, engagement, and the timing of impressions across videos

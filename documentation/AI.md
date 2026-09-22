@@ -18,7 +18,7 @@
 - AI-generated code was reviewed and tested on both team members' computers before being used.
 - Suggestions were compared with the course tutorials and project requirements, and unsuitable suggestions were modified or rejected.
 
-## Individual Assignment 2
+## Individual Assignment 2 - Nanyun Watch Events Analysis
 
 ### ChatGPT
 
@@ -32,3 +32,15 @@
 - AI-assisted code was run and checked locally before being retained.
 - Suggestions were compared with the course materials and assignment requirements.
 - Suggestions that were unsupported or did not match the data were rejected or revised.
+
+## Individual Assignment - Alex Session Analysis
+### Tilly Ai
+#### Version
+- Model: GPT-4.1
+
+#### Tool Usage
+- Assisted in Code-Creation for Data Cleaning.
+- Assisted in Code-Creation for the Visual Plots (Not in Idea-Creation).
+- Assisted in formulating a clear Conclusion in the Analysis File.
+- Assisted in creating the instructions of how to reproduce the analysis in the ReadME file.
+- Assisted in debugging the Makefile
