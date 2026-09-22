@@ -44,3 +44,15 @@
 - Assisted in formulating a clear Conclusion in the Analysis File.
 - Assisted in creating the instructions of how to reproduce the analysis in the ReadME file.
 - Assisted in debugging the Makefile
+
+## Integration and Merging Process
+
+### AI Assistance
+
+#### Tool Usage
+- Nanyun used ChatGPT to assist with the Git/GitHub integration process, including resolving merge conflicts, integrating the team workflows, and checking the final repository structure.
+- Alex used AI assistance during the final merging process.
+
+#### Output Validation
+- AI suggestions related to Git and merging were checked against the actual repository status and GitHub pull-request history before being applied.
+- The integrated project workflow was validated by running `make clean` followed by `make`.
