@@ -5,6 +5,8 @@ Data Preparation & Programming
 Project Owners: 
 - Alex Hendrikx
 
+Feedback Given by:
+- Nanyun Zhang
 
 ## Project Goal
 The goal of this part of the project is to create a visual overview of the TikTok session data file using ggplot2.
@@ -79,7 +81,7 @@ make
 
 The `clean` target keeps the raw downloaded dataset but removes the processed dataset and generated plot outputs so that they can be rebuilt.
 
-The Quarto document reads the cleaned data from `data/data_session/processed` and produces an HTML summary containing summaries and visualizations. Additionally, these visualizations are stored in `output/week3/`.
+The Quarto document reads the cleaned data from `data/data_session/processed` and produces an HTML summary containing summaries and visualizations. Additionally, these visualizations are stored in `output/session_analysis/`.
 
 
 ## Troubleshooting
