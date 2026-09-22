@@ -234,7 +234,7 @@ if (duplicate_count > 0) {
 
 # 8. SAVE CLEANED DATASET
 
-output_dir <- here("data", "watch_events", "cleaned")
+output_dir <- here("data", "watch_events", "processed")
 
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
