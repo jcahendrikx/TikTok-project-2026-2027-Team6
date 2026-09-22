@@ -18,3 +18,14 @@
 - AI-generated code was reviewed and tested on both team members' computers before being used.
 - Suggestions were compared with the course tutorials and project requirements, and unsuitable suggestions were modified or rejected.
 
+## Week 3 - Alex
+### Tilly Ai
+#### Version
+- Model: GPT-4.1
+
+#### Tool Usage
+- Assisted in Code-Creation for Data Cleaning.
+- Assisted in Code-Creation for the Visual Plots (Not in Idea-Creation).
+- Assisted in formulating a clear Conclusion in the Analysis File.
+- Assisted in creating the instructions of how to reproduce the analysis in the ReadME file.
+- Assisted in debugging the Makefile
