@@ -15,7 +15,7 @@ library(tidyverse)
 library(here)
 
 watch_events <- read_csv(
-  here("data", "watch_events", "cleaned", "watch_events_cleaned.csv"),
+  here("data", "watch_events", "processed", "watch_events_cleaned.csv"),
   show_col_types = FALSE
 )
 ```

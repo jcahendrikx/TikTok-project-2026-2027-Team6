@@ -24,7 +24,7 @@ summary(sessions)
 ## 3. Create Folder for Plot Outputs
 
 ```{r}
-output_dir <- here("output", "week3") #Create it outside of the src folder, as output graphs are not source code
+output_dir <- here("output", "session_analysis") #Create it outside of the src folder, as output graphs are not source code
 if (!dir.exists(output_dir)) {
   dir.create(output_dir, recursive = TRUE)
 }
@@ -52,7 +52,7 @@ ggplot(user_totals, aes(x = total_videos)) + # Plot the distribution as a histog
   ) +
   theme_minimal()
 
-ggsave(here("output", "week3", "histogram_videos_per_user.png"))
+ggsave(here("output", "session_analysis", "histogram_videos_per_user.png"))
 ```
 This histogram shows the distribution of total videos watched per user. Most users viewed around 100 videos, but there are several users with totals exceeding 300, resulting in a right-skewed distribution, rather than a symmaterical normal distribution.
 
@@ -75,7 +75,7 @@ ggplot(session_counts, aes(x = num_sessions)) +
   ) +
   theme_minimal()
 
-ggsave(here("output", "week3", "histogram_sessions_per_user.png"))
+ggsave(here("output", "session_analysis", "histogram_sessions_per_user.png"))
 ```
 This histogram shows the distribution of total watch sessions per user. Most users had around 30 watch sessions, but there are several users with total watch sessions exceeding 80, resulting in a right-skewed distribution, rather than a symmaterical normal distribution. 
 
@@ -101,7 +101,7 @@ ggplot(user_summary, aes(x = num_sessions, y = total_videos)) +
   ) +
   theme_minimal()
 
-ggsave(here("output", "week3", "scatter_sessions_vs_videos.png"))
+ggsave(here("output", "session_analysis", "scatter_sessions_vs_videos.png"))
 ```
 The scatter plot and the included black dashed regression line show a clear linear correlation between the number of sessions and number of videos watched. While this is no clear sign of causation, it can be argued that on average, when the number of sessions per user increases, the number of videos watched per user also increases.
 
@@ -114,7 +114,7 @@ ggplot(sessions, aes(x = session_duration_sec, y = videos_viewed)) +
   labs(title = "Session Duration vs. Videos Viewed", x = "Session Duration (sec)", y = "Videos Viewed") +
   theme_minimal()
 
-ggsave(here("output", "week3", "scatter_seconds_vs_videos.png"))
+ggsave(here("output", "session_analysis", "scatter_seconds_vs_videos.png"))
 ```
 This scatter plot of the duration of each session versus the number of videos watched per session shows whether longer sessions are typically associated with watching more videos, as one would logically presume. This positive association does indeed exist, as shown by the upsloping black regression line.
 

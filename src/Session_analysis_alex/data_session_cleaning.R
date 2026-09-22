@@ -36,10 +36,10 @@ duplicate_session_ids <- sessions %>%
 exact_duplicates
 duplicate_session_ids
 
-#6. Remove only exact duplicate rows and missing data
-sessions_after_duplicates <- sessions %>%
-  distinct()
-
+#6. Remove only exact rows and missing data
+sessions_after_duplicates <- sessions %>% 
+  distinct(pick(-session_id), .keep_all = TRUE) #Actually Removes the duplicates if they occur when the dataset changes in the future
+#Exclude the session_id variable as it is a unique indicator for each row. Not omitting it means that duplicates can never be found, even if they occur.
 duplicates_removed <- nrow(sessions) - nrow(sessions_after_duplicates)
 
 sessions_clean <- sessions_after_duplicates %>%
