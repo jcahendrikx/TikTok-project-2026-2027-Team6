@@ -1,9 +1,9 @@
 # Watch Events Analysis
 
-This folder contains the individual analysis for Issue #10: **Inspect and analyze the TikTok watch events dataset**. 
+This folder contains the individual analysis for Issue #10: **Inspect and analyze the TikTok watch events dataset**.
 
-Analysis performed by: Nanyun Zhang
-Feedback given and Changes made by: Alex Hendrikx
+Analysis performed by: Nanyun Zhang  
+Feedback given and changes made by: Alex Hendrikx
 
 The analysis examines user watch behavior, watch duration, session-level engagement, and time-of-day activity. It also checks and normalizes the mixed timestamp formats present in the raw data.
 
@@ -24,10 +24,10 @@ The analysis focuses on:
 The main files used for this analysis are:
 
 - `download_watch_events.R` — downloads the watch events dataset into the project data folder.
-- `clean_watch_events.R` - contains the data inspection and cleaning
+- `cleaning_watch_events.R` — contains the data inspection and cleaning workflow.
 - `Summary_watch_events.qmd` — contains the data analysis and visualizations.
 - `Summary_watch_events.html` — rendered HTML report generated from the Quarto document.
-- `makefile` — automates data downloading and report generation based on file dependencies.
+- `Makefile` (repository root) — integrated Makefile that coordinates the team analysis workflows and rebuilds outputs based on file dependencies.
 - `README.md` — provides instructions for reproducing the analysis.
 
 The downloaded raw dataset is stored in:
@@ -37,6 +37,7 @@ data/watch_events/raw/watch_events.csv
 ```
 
 The cleaned dataset is stored in:
+
 ```text
 data/watch_events/processed/watch_events_cleaned.csv
 ```
@@ -66,13 +67,13 @@ The dataset is downloaded automatically by `download_watch_events.R`. The local 
 
 ## Data Preparation
 
-The data cleaning is performed in `clean_watch_events.R` and checks for missing values and timestamp formats.
+The data cleaning is performed in `cleaning_watch_events.R` and checks for missing values, duplicate entries, and timestamp formats.
 
-Missing values are checked and found in the raw dataset for `watch_seconds`. For the rows with the action `skip_immediate` that have a missing value for `watch_seconds`, the missing values were replaced with a 0, as the watch duration is 0 by principle. For all other actions and missing data for all other variables, rows are automatically removed in the cleaning process. This part of the cleaning process changes the total observations from 97,702 to 93,211.
+Missing values are found in the raw dataset for `watch_seconds`. For rows with the action `skip_immediate` and a missing value for `watch_seconds`, the missing value is replaced with `0`, because an immediate skip implies no observed watch duration. For the remaining missing values, rows are removed during the cleaning process. This changes the number of observations from 98,702 to 93,211.
 
 The raw start timestamps contain multiple formats, including ISO 8601 timestamps, compact date-time strings, and UNIX timestamps. These values are normalized into a consistent datetime variable and validated against the existing parsed timestamp.
 
-After the datetime normalization has taken place, the data is checked for duplicate entries, excluding the impression_id and watch_event_id variables, as they are unique for each entry. Duplicate values are then automatically removed from the dataset and a message is shown how many of these are deleted.
+After datetime normalization, the data is checked for duplicate entries while excluding `impression_id` and `watch_event_id`, because these variables uniquely identify individual entries. Any duplicate observations are automatically removed, and the script reports how many rows were removed.
 
 The cleaned dataset is saved as `watch_events_cleaned.csv` and serves as the input for the analysis document.
 
@@ -105,65 +106,44 @@ install.packages("here")
 ```
 
 ## Reproducing the Analysis
-There are Two Methods to run the Make File:
 
-### Changing Directory
-From the root folder of the repository, move to the watch-events analysis directory:
+The project uses an integrated Makefile located in the root of the repository. The root Makefile coordinates the video analysis, session analysis, and watch-events analysis workflows.
 
-```bash
-cd src/watch_events_analysis
-```
-
-Run the complete workflow with:
-
-```bash
-make
-```
-When this method is applied, make sure to set the current working directory back to the parent directory when trying to make git commands:
-```bash
-cd ../..
-```
- 
-### Signaling Make Directory
-Another way to do this, is to stay in the current, main, directory, but indicate the directory of the Make file in the command:
-
-```bash
-make -C "src/watch_events_analysis"
-```
-
-The Makefile automatically downloads `watch_events.csv` if the dataset is not already available and renders the Quarto analysis when the required inputs have changed.
-
-The expected HTML output is:
-
-```text
-Summary_watch_events.html
-```
-
-The generated PNG figures are saved in:
-
-```text
-../../output/watch_events/
-```
-
-To remove the generated HTML report and figures, run:
-
-```bash
-make clean
-```
-
-The downloaded raw dataset is retained when running `make clean`.
-
-To rebuild the analysis from the generated-output stage, run:
+For a complete reproducibility check, run the following commands from the root of the repository:
 
 ```bash
 make clean
 make
 ```
+
+The `make clean` command removes generated data and analysis outputs. The following `make` command then rebuilds the complete project workflow, including downloading required datasets, cleaning the data, and rendering the analysis reports.
+
+For normal use, when a complete rebuild is not required, run:
+
+```bash
+make
+```
+
+Make will only rebuild outputs whose source files or dependencies have changed.
+
+For the watch-events analysis, the expected HTML output is:
+
+```text
+src/watch_events_analysis/Summary_watch_events.html
+```
+
+The generated figures are stored in:
+
+```text
+output/watch_events/
+```
+
+After a successful build, running `make` again should not unnecessarily rebuild outputs whose dependencies have not changed.
 
 ## Troubleshooting
 
 - If `Rscript` is not recognized, check that R is installed and available on the system PATH.
-- If the dataset is missing, run `make`; the Makefile will call the download script automatically.
+- If a dataset is missing, run `make`; the integrated Makefile will call the required download script automatically.
 - If required R packages are missing, install `tidyverse` and `here`.
 - If Quarto cannot locate R, run `quarto check` to verify the installation.
 - The time-of-day analysis uses UTC timestamps. Hours 22 and 23 are not represented consistently across all 60 dates and are therefore excluded from the main hourly comparison.
