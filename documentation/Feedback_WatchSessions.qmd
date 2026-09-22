@@ -1,0 +1,25 @@
+---
+title: "Feedback Watch Sessions"
+format: html
+---
+
+# Comments Alex
+## Reproducibility & General Structure
+- Makefile runs perfectly, both before and after cleaning after the first run. Good instructions in the README to first move the directory to the specific folder. Please note in the README that if git commands need to be run, you first need to go back to the parent directory.
+    - Another option is to type "make -C "src/watch_events_analysis" instead. Then you don't have to switch back to the parent directory. Make sure to add this to the README.
+- Nothing to comment on the data downloading document.
+- If you were to work with a continuously updating database, you are vulnerable to missing values, as you do not automatically clean them. Currently, you do check for missing values for watch_seconds, but *decide* not to remove them. If your underlying data were to grow, there is a chance there will be many more missing values, which would then not get removed. Therefore, it would be, in my opinion, better to remove all the rows with empty "watch_seconds".
+  - Also make sure to include in the code to remove potential future missing values for any of the other key variables, even if they don't have any missing values now.
+- You do not check for and remove any duplicate rows. This should definitely be included, as it could skew data substantially.
+- In my opinion, it is better to split the data cleaning and summary analysis into two separate scripts/markdowns, as they have two different goals. This will be especially critical when both the documents grow in size, making it clear what the goal of each script is.
+- Add the /output folder to the .gitignore as per the tutorial instructions.
+  
+
+## Coding Improvements & Analysis Enhancements
+- Good Normalization of Timestaps.
+- Could change the color of the Distribution of Watch Events column to blue instead of this less-appealing gray. Also, change the labels of each action. For example, skip_immediate should become "Skip Immediate" to improve the graph's appearance.
+- Good Watch Time by Action Visualization. Your small interpretation, however, is slightly off. Here, you compare the averages between the four User Actions, while the boxplots do not show the means but the medians. While it doesn't have that big of an impact, especially as you do show the averages one codeblock above it, the interpretation should still be done accurately with respect to the Figure shown.
+- For "Distribution of Events per Session" I miss a one-sentence explanation of what a watch_event actually is. That is key to the interpretation of the distribution.
+- The Time-of-Day Behavior output (the in between output, not the end graph) is very difficult to read; either omit the Index, or make the hour variable clearer. Did you check the dataset that 
+  - Additionally, I think omitting the last hour with data, hour 22, is unjustified. It has 58 observations compared to 60, which is not that substantial of a drop. Additionally, as people presumably watch TikTok more during those evening hours, removing that hour might change results. So, at least add a robustness check to see whether results change when including it vs not including it.
+  - The visualization itself is performed well. Interpretations are done correctly

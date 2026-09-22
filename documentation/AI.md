@@ -18,7 +18,22 @@
 - AI-generated code was reviewed and tested on both team members' computers before being used.
 - Suggestions were compared with the course tutorials and project requirements, and unsuitable suggestions were modified or rejected.
 
-## Week 3 - Alex
+## Individual Assignment 2 - Nanyun Watch Events Analysis
+
+### ChatGPT
+
+#### Tool Usage
+- Assistance with interpreting Issue #10 requirements.
+- Assistance with drafting and debugging R, Quarto, and Makefile code.
+- Assistance with checking missing values, timestamp formats, and visualizations.
+- Assistance with improving reproducibility and documentation.
+
+#### Output Validation
+- AI-assisted code was run and checked locally before being retained.
+- Suggestions were compared with the course materials and assignment requirements.
+- Suggestions that were unsupported or did not match the data were rejected or revised.
+
+## Individual Assignment - Alex Session Analysis
 ### Tilly Ai
 #### Version
 - Model: GPT-4.1

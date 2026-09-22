@@ -1,0 +1,351 @@
+---
+title: "Summary of Watch Events"
+format: html
+---
+
+# TikTok Watch Events Analysis
+
+This report provides an overview of the TikTok watch events dataset, including user actions, watch duration, missing values, and timestamp formats.
+
+## 1. Load the Data
+```{r}
+#| label: load-data
+
+library(tidyverse)
+library(here)
+
+watch_events <- read_csv(
+  here("data", "watch_events", "cleaned", "watch_events_cleaned.csv"),
+  show_col_types = FALSE
+)
+```
+The `here` package is used to locate the dataset from the project root. This makes the analysis reproducible regardless of the current working directory.
+
+## 2. Dataset Overview
+```{r}
+#| label: dataset-overview
+
+head(watch_events)
+glimpse(watch_events)
+```
+This section provides a first look at the structure and contents of the watch events dataset, including the available variables and their data types.
+
+## 3. Summary Statistics
+```{r}
+#| label: summary-statistics
+
+watch_summary <- watch_events %>%
+  summarise(
+    number_of_watch_events = n(),
+    number_of_users = n_distinct(user_id),
+    number_of_sessions = n_distinct(session_id),
+    number_of_videos = n_distinct(video_id),
+    number_of_creators = n_distinct(creator_id),
+    average_watch_seconds = mean(watch_seconds, na.rm = TRUE),
+    median_watch_seconds = median(watch_seconds, na.rm = TRUE)
+  )
+
+print(watch_summary, width = Inf)
+```
+The cleaned dataset contains 93,211 watch events from 724 users across 25,202 sessions, covering 4,199 videos from 218 creators. Among observations with available watch duration, the average watch time is 12.4 seconds and the median is 8 seconds. The higher mean compared with the median suggests that some longer watch events increase the average duration.
+
+## 4. Distribution of Watch Actions
+```{r}
+#| label: fig-action-distribution
+#| fig-cap: "Distribution of user actions across all watch events."
+
+action_summary <- watch_events %>%
+  count(action, sort = TRUE) %>%
+  mutate(
+    percentage = n / sum(n) * 100
+  )
+
+action_summary
+
+output_dir <- here("output", "watch_events")
+
+dir.create(
+  output_dir,
+  recursive = TRUE,
+  showWarnings = FALSE
+)
+
+action_plot <- ggplot(
+  action_summary %>%
+    mutate(
+      action = forcats::fct_recode(
+        action,
+        "Skip Immediate" = "skip_immediate",
+        "Skip After Partial" = "skip_after_partial",
+        "Watch Full" = "watch_full",
+        "Exit Platform" = "exit_platform"
+      )
+    ),
+  aes(x = reorder(action, n), y = n)
+) +
+  geom_col(fill = "lightblue") +
+  coord_flip() +
+  labs(
+    title = "Distribution of Watch Event Actions",
+    x = "Action",
+    y = "Number of Events"
+  ) +
+  theme_minimal()
+
+action_plot
+
+ggsave(
+  filename = here(
+    "output",
+    "watch_events",
+    "action_distribution.png"
+  ),
+  plot = action_plot,
+  width = 8,
+  height = 5
+)
+```
+The four watch actions occur at very similar frequencies. As rows with missing data for watch_seconds were removed, except for those with the action `skip_immediate`, which were logically set to 0, `skip_immediate` is the most common action within the cleaned dataset with 25.8% of all rows. `exit_platform` is the second most common action at 25.5%, followed by `watch_full` at 25.7%, while `skip_after_partial` accounts for 24%. Overall, no single action strongly dominates the watch events.
+
+## 5. Watch Time by Action
+```{r}
+#| label: watch-time-summary
+
+watch_time_summary <- watch_events %>%
+  group_by(action) %>%
+  summarise(
+    number_of_observations = n(),
+    average_watch_seconds = mean(watch_seconds),
+    median_watch_seconds = median(watch_seconds),
+    minimum_watch_seconds = min(watch_seconds),
+    maximum_watch_seconds = max(watch_seconds)
+  ) %>%
+  arrange(desc(average_watch_seconds))
+
+watch_time_summary
+```
+Watch duration is summarized separately for each user action. 
+```{r}
+#| label: fig-watch-time-by-action
+#| fig-cap: "Distribution of watch duration across the four user actions."
+
+watch_time_plot <- watch_events %>%
+  ggplot(
+    aes(
+      x = action,
+      y = watch_seconds
+    )
+  ) +
+  geom_boxplot() +
+  scale_x_discrete(
+    labels = function(x) {
+      str_to_title(str_replace_all(x, "_", " "))
+    }
+  ) +
+  labs(
+    title = "Watch Duration by User Action",
+    x = "Action",
+    y = "Watch Time (seconds)"
+  ) +
+  theme_minimal()
+
+watch_time_plot
+
+ggsave(
+  filename = here(
+    "output",
+    "watch_events",
+    "watch_time_by_action.png"
+  ),
+  plot = watch_time_plot,
+  width = 8,
+  height = 5
+)
+```
+Watch duration differs substantially across the four user actions. `watch_full` events have the longest watch duration, with an average of 30.1 seconds and a median of 30 seconds. `skip_after_partial` events have an average duration of 14.4 seconds with a median of 13 seconds, while `exit_platform` events average 6.07 seconds and have a median of 6 seconds. As expected, `skip_immediate` events have a mean and median watch duration of 0 seconds. Overall, the watch-duration patterns are clearly consistent with the different types of user action.
+
+## 6. Session-Level Engagement
+```{r}
+#| label: session-level-summary
+
+session_level <- watch_events %>%
+  group_by(
+    session_id,
+    user_id
+  ) %>%
+  summarise(
+    number_of_events = n(),
+
+    total_watch_seconds = if_else(
+      all(is.na(watch_seconds)),
+      NA_real_,
+      sum(watch_seconds, na.rm = TRUE)
+    ),
+
+    missing_watch_events = sum(
+      is.na(watch_seconds)
+    ),
+
+    .groups = "drop"
+  )
+
+session_summary <- session_level %>%
+  summarise(
+    number_of_sessions = n(),
+    average_events_per_session = mean(number_of_events),
+    median_events_per_session = median(number_of_events),
+
+    average_watch_seconds_per_session = mean(
+      total_watch_seconds,
+      na.rm = TRUE
+    ),
+
+    median_watch_seconds_per_session = median(
+      total_watch_seconds,
+      na.rm = TRUE
+    )
+  )
+
+print(session_summary, width = Inf)
+```
+The cleaned dataset contains 25,202 user sessions. A session contains an average of 3.7 watch events, with a median of 3 events. The average observed watch time per session is 46.0 seconds, while the median is 30 seconds. The higher averages compared with the medians suggest that most sessions are relatively short, while a smaller number of longer sessions increase the overall averages.
+
+### Distribution of Events per Session
+```{r}
+#| label: fig-events-per-session
+#| fig-cap: "Distribution of the number of watch events within each user session."
+
+session_events_plot <- ggplot(
+  session_level,
+  aes(x = number_of_events)
+) +
+  geom_histogram(
+    binwidth = 1,
+    boundary = 0,
+    fill = "#87CEEB",
+    color = "black"  
+  ) +
+  labs(
+    title = "Number of Watch Events per Session",
+    x = "Number of Watch Events",
+    y = "Number of Sessions"
+  ) +
+  theme_minimal()
+
+session_events_plot
+
+ggsave(
+  filename = here(
+    "output",
+    "watch_events",
+    "events_per_session.png"
+  ),
+  plot = session_events_plot,
+  width = 8,
+  height = 5
+)
+```
+Most user sessions contain only a small number of watch events, with one-event sessions occurring most frequently. Here, one watch event is defined as one viewer seeing a specific video 1 time. The number of sessions decreases rapidly as the number of watch events increases, producing a strongly right-skewed distribution. A relatively small number of sessions contain many watch events, which helps explain why the average number of events per session is higher than the median.
+
+## 7. Time-of-Day Behavior
+```{r}
+#| label: hourly-activity-summary
+hourly_activity <- watch_events %>%
+  mutate(
+    hour = as.integer(
+      format(
+        started_at_normalized,
+        "%H"
+      )
+    )
+  ) %>%
+  group_by(hour) %>%
+  summarise(
+    number_of_events = n(),
+    average_watch_seconds = mean(
+      watch_seconds,
+      na.rm = TRUE
+    ),
+    .groups = "drop"
+  ) %>%
+  arrange(hour)
+
+print(hourly_activity, n = Inf, width = Inf)
+```
+The normalized timestamps are used to examine how watch activity varies across the 24 hours of the day. The hourly values are based on the UTC timestamps used in the dataset.
+
+```{r}
+#| label: hourly-date-coverage
+
+hourly_date_coverage <- watch_events %>%
+  mutate(
+    date = as.Date(started_at_normalized),
+    hour = as.integer(
+      format(started_at_normalized, "%H")
+    )
+  ) %>%
+  group_by(hour) %>%
+  summarise(
+    number_of_events = n(),
+    number_of_dates = n_distinct(date),
+    .groups = "drop"
+  ) %>%
+  arrange(hour)
+
+print(hourly_date_coverage, n = Inf, index = FALSE)
+
+```
+Hours 0 through 21 are represented on all 60 dates in the dataset. In contrast, hour 22 appears on only 58 dates and contains substantially fewer events, while hour 23 is absent entirely. Because the dataset alone does not indicate whether this pattern reflects user behavior or the observation process, hours 22 and 23 are excluded from the main time-of-day comparison.
+
+### Watch Activity by Hour
+```{r}
+#| label: fig-hourly-watch-activity
+#| fig-cap: "Number of watch events by hour of day for hours represented on all 60 dates."
+hourly_activity_complete <- hourly_activity %>%
+  filter(hour <= 21)
+
+hourly_activity_plot <- ggplot(
+  hourly_activity_complete,
+  aes(
+    x = hour,
+    y = number_of_events
+  )
+) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(
+    breaks = 0:21
+  ) +
+  labs(
+    title = "Watch Activity by Hour of Day",
+    x = "Hour of Day (UTC)",
+    y = "Number of Watch Events"
+  ) +
+  theme_minimal()
+
+hourly_activity_plot
+
+ggsave(
+  filename = here(
+    "output",
+    "watch_events",
+    "hourly_watch_activity.png"
+  ),
+  plot = hourly_activity_plot,
+  width = 8,
+  height = 5
+)
+```
+Across the fully observed hours from 00:00 to 21:00 UTC, watch activity remains relatively stable, with approximately 3,900 to 4,500 events per hour. Although some local peaks and dips are visible, there is no strong overall time-of-day pattern. Average watch duration is also highly consistent across hours, remaining close to 12–13 seconds.
+
+Hours 22 and 23 are not included in the main comparison because they are not represented consistently across the 60 dates. Their lower event counts therefore should not be interpreted directly as evidence of lower user activity.
+
+## 8. Conclusion
+
+The cleaned watch-events dataset contains 93,211 observations across 25,202 user sessions. The four watch actions occur at similar frequencies, with no single action dominating the dataset.
+
+Watch duration differs clearly by action. Full-watch events have the longest observed duration, while immediate skips have a watch duration of zero. Partial skips and platform exits fall between these two extremes.
+
+At the session level, users generate a median of 3 watch events and 30 seconds of observed watch time per session. Session activity is strongly right-skewed, with most sessions containing only a few watch events and a smaller number of much longer sessions.
+
+Across hours 0 through 21, which are represented on all 60 dates, watch activity and average watch duration remain relatively stable, with no strong time-of-day pattern.
