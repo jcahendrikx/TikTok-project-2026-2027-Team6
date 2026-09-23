@@ -1,0 +1,122 @@
+---
+title: "Summary SQLite Tables"
+format: html
+---
+
+# SQLite Summaries
+In this file, several tables will be queried and summarised to show our skills of using SQL. 
+
+## 1. Load the Packages and Data
+```{r}
+library(tidyverse)
+library(RSQLite)
+library(DBI)
+
+con <- dbConnect(SQLite(), dbname = "data/raw/tiktok_students.sqlite")
+print(dbListTables(con))
+combined_data <- dbGetQuery(con, "
+  SELECT 
+    i.interaction_id,
+    i.creator_id,
+    i.video_id,
+    i.interaction_type,
+    i.interaction_at,
+    v.published_at,
+    c.creator_name
+  FROM interactions i
+  LEFT JOIN videos v 
+    ON i.video_id = v.video_id 
+    AND i.creator_id = v.creator_id
+  LEFT JOIN creators c 
+    ON i.creator_id = c.creator_id
+")
+dbDisconnect(con)
+head(combined_data, 20)
+cat("Number of missing values in combined_data: ", sum(is.na(combined_data)), "\n")
+```
+It shows that there are 10 different tables included in the SQL database. This summary will use variables from three of these tables: creators, interactions, and videos. The absence of missing values confirms that all interactions have matching records in both the videos and creators tables.
+
+## 2. Changing of UNIX Codes
+```{r}
+combined_data <- combined_data %>%
+  mutate(
+    interaction_at = as.POSIXct(interaction_at, origin = "1970-01-01"),
+    published_at = as.POSIXct(published_at, origin = "1970-01-01")
+  )
+head(combined_data)
+```
+Changes the UNIX code variables (`interaction_at` and `published_at`) to their corresponding dates and times.
+
+## 3. Top Likes per Creator
+```{r}
+likes_per_creator <- combined_data %>%
+  filter(interaction_type == "like") %>%
+  group_by(creator_id, creator_name) %>%
+  summarise(
+    total_likes = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(total_likes))
+
+head(likes_per_creator, 20)
+```
+Shows which creators have gotten the most likes. Olivia tv has obtained the most likes, with 2098 in total.
+
+## 4. Top Days With The Most Likes For an Individual Creator
+```{r}
+peak_like_days_individual_creators <- combined_data %>%
+  filter(interaction_type == "like") %>%
+  mutate(like_date = as.Date(interaction_at)) %>%
+  group_by(creator_id, creator_name, like_date) %>%
+  summarise(
+    likes_on_day = n(),
+    .groups = "drop"
+  ) %>%
+  group_by(creator_id, creator_name) %>%
+  slice_max(likes_on_day, n = 1) %>%  
+# Get the day with most likes per creator
+  ungroup() %>%
+  arrange(desc(likes_on_day))
+
+head(peak_like_days_individual_creators)
+```
+This shows that the highest number of likes an individual creator got on one dat was 21 likes for Hnery fit on 2025-08-01.
+
+## 5. Top Total Likes Per Date of Uploading
+```{r}
+likes_by_publish_date <- combined_data %>%
+  filter(interaction_type == "like") %>%
+  mutate(publish_date = as.Date(published_at)) %>%
+  group_by(publish_date) %>%
+  summarise(
+    total_likes = n(),
+    number_of_videos = n_distinct(video_id),
+    number_of_creators = n_distinct(creator_id),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(total_likes))
+
+head(likes_by_publish_date)
+```
+This shows that the oldest videos have obtained the most likes. The most likely reason for this is that they have had the longest time of being online, meaning they have had more opportunities to receive likes.
+
+## 6. Total likes by first name
+```{r}
+# Extract first name, convert to lowercase, and sum likes per first name
+likes_by_first_name <- combined_data %>%
+  filter(interaction_type == "like") %>%
+  mutate(
+    first_name = tolower(word(creator_name, 1))  
+# Extract first word, lowercase
+  ) %>%
+  group_by(first_name) %>%
+  summarise(
+    total_likes = n(),
+    num_creators = n_distinct(creator_id),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(total_likes))
+
+head(likes_by_first_name)
+```
+This shows which registered first name have achieved the highest total number of likes. It uses the part of creator_name before the first space and changes all names to include only lower case letters to make Emma = emma which makes it easier to compare and avoid duplicates caused by different capitalisation. It shows that creators with the first name being Emma, Henry, Sophia, and Lucas achieved the highest number of likes.
