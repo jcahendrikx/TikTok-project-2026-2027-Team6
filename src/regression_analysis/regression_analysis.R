@@ -14,7 +14,6 @@ library(fixest)
 
 session_path <- here(
   "data",
-  "data_session",
   "processed",
   "cleaned_sessions.csv"
 )
@@ -228,7 +227,6 @@ duration_distribution_plot <- ggplot(
   ) +
   theme_minimal()
 
-duration_distribution_plot
 
 # Show the distribution of session duration on the transformed regression scale.
 
@@ -257,7 +255,6 @@ relationship_plot <- ggplot(
   ) +
   theme_minimal()
 
-relationship_plot
 
 # Visualise the raw relationship between session duration and videos viewed.
 
@@ -316,7 +313,6 @@ time_of_day_plot <- ggplot(
   ) +
   theme_minimal()
 
-time_of_day_plot
 
 # Explore whether session engagement differs across different times of day.
 
@@ -500,7 +496,6 @@ coefficient_plot <- ggplot(
     )
   )
 
-coefficient_plot
 
 # Visualise how the association changes after time controls and user fixed effects are added.
 
@@ -575,7 +570,6 @@ residual_plot <- ggplot(
   ) +
   theme_minimal()
 
-residual_plot
 
 # Inspect residual patterns in the final fixed-effects model.
 
@@ -600,7 +594,6 @@ qq_plot <- ggplot(
   ) +
   theme_minimal()
 
-qq_plot
 
 # Inspect the residual distribution of the final fixed-effects model.
 
