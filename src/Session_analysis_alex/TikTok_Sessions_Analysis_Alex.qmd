@@ -16,7 +16,7 @@ For this analysis, the following packages are needed: 1. tidyverse, 2. here
 ## 2. Loading The Data
 
 ```{r}
-sessions <- read.csv(here("data", "data_session", "processed", "cleaned_sessions.csv"))
+sessions <- read.csv(here("data", "processed", "cleaned_sessions.csv"))
 head(sessions)
 summary(sessions)
 ```

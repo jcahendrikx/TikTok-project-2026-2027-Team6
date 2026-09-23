@@ -3,9 +3,17 @@
 library(tidyverse)
 library(here)
 library(janitor)
+library(RSQLite)
 
 
 #2. Loading The Data
+con <- dbConnect(SQLite(), dbname = "data/raw/tiktok_students.sqlite")
+print(dbListTables(con))
+sessions <- dbGetQuery(con, "SELECT * FROM table_name")
+dbDisconnect(con)
+
+
+
 sessions <- read.csv(here("data", "data_session", "raw", "sessions.csv"))
 head(sessions)
 dim(sessions) #It shows that the sessions datafile consists of only 7 columns, but almost 100,000 rows of data
@@ -73,9 +81,9 @@ sessions_clean %>%
 
 #8. Save the cleaned file to Processed Folder
 #8.1 Create Processed Folder if Needed
-if (!dir.exists("data/data_session/processed")) {
-  dir.create("data/data_session/processed", recursive = TRUE)
+if (!dir.exists("data/processed")) {
+  dir.create("data/processed", recursive = TRUE)
 }
 
 #8.2 Download the Cleaned Csv File
-write_csv(sessions_clean, "data/data_session/processed/cleaned_sessions.csv")
+write_csv(sessions_clean, "data/processed/cleaned_sessions.csv")
