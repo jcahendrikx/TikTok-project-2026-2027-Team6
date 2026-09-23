@@ -4,16 +4,19 @@
 # Purpose: Load raw data, handle mixed timestamp formats, validate data 
 #          quality, and save cleaned dataset
 #
-# Output: data/watch_events_cleaned/cleaned/watch_events_cleaned.csv
+# Output: data/processed/watch_events_cleaned.csv
 # ============================================================================
 
 library(tidyverse)
 library(here)
+library(RSQLite)
 
 # 1. LOAD DATA 
 
+
+#2. Loading The Data
 watch_events <- read_csv(
-  here("data", "watch_events", "raw", "watch_events.csv"),
+  here("data", "raw", "watch_events.csv"),
   show_col_types = FALSE
 )
 
@@ -234,7 +237,7 @@ if (duplicate_count > 0) {
 
 # 8. SAVE CLEANED DATASET
 
-output_dir <- here("data", "watch_events", "processed")
+output_dir <- here("data", "processed")
 
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 

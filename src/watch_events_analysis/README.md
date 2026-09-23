@@ -33,13 +33,13 @@ The main files used for this analysis are:
 The downloaded raw dataset is stored in:
 
 ```text
-data/watch_events/raw/watch_events.csv
+data/raw/watch_events.csv
 ```
 
 The cleaned dataset is stored in:
 
 ```text
-data/watch_events/processed/watch_events_cleaned.csv
+data/processed/watch_events_cleaned.csv
 ```
 
 Generated figures are stored in:
