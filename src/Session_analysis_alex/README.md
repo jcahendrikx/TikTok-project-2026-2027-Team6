@@ -19,10 +19,10 @@ The main files used in the project are:
 - `Makefile` - runs the script based on the existence of the outputs
 
 ## Data
-The raw dataset is downloaded to `data/data_session/raw/sessions.csv`
-The cleaned dataset is saved in `data/data_session/processed/cleaned_sessions.csv`
+The raw dataset is downloaded to `data/raw/sessions.csv`
+The cleaned dataset is saved in `data/processed/cleaned_sessions.csv`
 
-Note: All data and output files are stored outside the analysis folder (`src/Session_analysis_alex`) and referenced with paths relative to the root project (e.g., `data/data_session/...`, `output/week3/...`)
+Note: All data and output files are stored outside the analysis folder (`src/Session_analysis_alex`) and referenced with paths relative to the root project.
 
 
 ## Requirements
@@ -81,7 +81,7 @@ make
 
 The `clean` target keeps the raw downloaded dataset but removes the processed dataset and generated plot outputs so that they can be rebuilt.
 
-The Quarto document reads the cleaned data from `data/data_session/processed` and produces an HTML summary containing summaries and visualizations. Additionally, these visualizations are stored in `output/session_analysis/`.
+The Quarto document reads the cleaned data from `data/processed` and produces an HTML summary containing summaries and visualizations. Additionally, these visualizations are stored in `output/session_analysis/`.
 
 
 ## Troubleshooting
