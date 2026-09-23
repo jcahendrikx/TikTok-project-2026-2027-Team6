@@ -7,7 +7,18 @@ library(RSQLite)
 
 
 #2. Loading The Data
+<<<<<<< HEAD
 sessions <- read.csv(here("data", "raw", "sessions.csv"))
+=======
+con <- dbConnect(SQLite(), dbname = "data/raw/tiktok_students.sqlite")
+print(dbListTables(con))
+sessions <- dbGetQuery(con, "SELECT * FROM table_name")
+dbDisconnect(con)
+
+
+
+sessions <- read.csv(here("data", "data_session", "raw", "sessions.csv"))
+>>>>>>> d72357c7322d1e453f9e9eb83b77ace7261fbc3e
 head(sessions)
 dim(sessions) #It shows that the sessions datafile consists of only 7 columns, but almost 100,000 rows of data
 summary(sessions)

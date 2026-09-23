@@ -9,6 +9,7 @@
 
 library(tidyverse)
 library(here)
+library(RSQLite)
 
 # 1. LOAD DATA 
 
