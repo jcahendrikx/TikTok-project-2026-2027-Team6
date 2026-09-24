@@ -33,7 +33,7 @@
 - Suggestions were compared with the course materials and assignment requirements.
 - Suggestions that were unsupported or did not match the data were rejected or revised.
 
-## Individual Assignment - Alex Session Analysis
+## Individual Assignment 2 - Alex Session Analysis
 ### Tilly Ai
 #### Version
 - Model: GPT-4.1
@@ -45,7 +45,7 @@
 - Assisted in creating the instructions of how to reproduce the analysis in the ReadME file.
 - Assisted in debugging the Makefile
 
-## Integration and Merging Process
+## Assignment 3: Integration and Merging Process
 
 ### AI Assistance
 
@@ -56,3 +56,14 @@
 #### Output Validation
 - AI suggestions related to Git and merging were checked against the actual repository status and GitHub pull-request history before being applied.
 - The integrated project workflow was validated by running `make clean` followed by `make`.
+
+## Assignment 4
+
+### Tilly AI
+#### Version & Settings
+- Model: Claude
+
+#### Tool Usage
+- Assisted with resolving merging conflicts after issues with versioning on Git
+- Assisted with the SQL code to select the relevant table columns
+- Assisted with the formatting options to create a PDF file for the final analysis

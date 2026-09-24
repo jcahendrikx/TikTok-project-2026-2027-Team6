@@ -1,0 +1,47 @@
+---
+title: "Comprehensive TikTok Platform Analysis: Data Inspection, Descriptive Analyses, and Regression Results"
+author: "Data Preparation & Programming Team 6 (Alex Hendrikx, Nanyun Zhang)"
+date: today
+format:
+    pdf:
+        toc: true
+        toc-depth: 2
+        number-sections: true
+        geometry:
+            - margin=1in
+execute:
+    echo: false
+    warning: false
+    message: false
+---
+
+# Final Analysis Summary
+## Project Completed By:
+Data Preparation & Programming Team 6:
+
+- Alex Hendrikx
+
+- Nanyun Zhang
+
+## Data Downloading & Cleaning
+For each dataset, we downloaded the raw files from the specified sources, verified file integrity, and removed duplicates. We then standardized column names, handled missing values, and ensured consistent data types across all tables. Finally, we performed basic validation checks to confirm the cleaned data was ready for analysis. The exact codes are recorded in the respective downloading and cleaning files:
+
+1. Video View:
+    
+    - `src/downloading_videodata_script.R`
+
+2. Sessions:
+    
+    - `src/Session_analysis_alex/data_session_download.R`
+   
+    - `src/Session_analysis_alex/data_session_cleaning.R`
+
+3. Watch Events:
+    
+    - `src/watch_events_analysis/download_watch_events.R`
+   
+    - `src/watch_events_analysis/cleaning_watch_events.R`
+
+This summary document focuses purely on the actual analyses and regressions performed, meaning that no more attention will be given on the data cleaning process.
+
+## 
