@@ -105,7 +105,7 @@ ggsave(
   height = 5
 )
 ```
-The four watch actions occur at very similar frequencies. As rows with missing data for watch_seconds were removed, except for those with the action `skip_immediate`, which were logically set to 0, `skip_immediate` is the most common action within the cleaned dataset with 25.8% of all rows. `exit_platform` is the second most common action at 25.5%, followed by `watch_full` at 24.8%, while `skip_after_partial` accounts for 24%. Overall, no single action strongly dominates the watch events.
+The four watch actions occur at very similar frequencies. As rows with missing data for watch_seconds were removed, except for those with the action `skip_immediate`, which were logically set to 0, `skip_immediate` is the most common action within the cleaned dataset with 25.8% of all rows. `exit_platform` is the second most common action at 25.5%, followed by `watch_full` at 24.7%, while `skip_after_partial` accounts for 24%. Overall, no single action strongly dominates the watch events.
 
 ## 5. Watch Time by Action
 ```{r}
