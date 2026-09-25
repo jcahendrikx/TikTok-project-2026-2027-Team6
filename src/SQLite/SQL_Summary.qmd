@@ -11,8 +11,12 @@ In this file, several tables will be queried and summarised to show our skills o
 library(tidyverse)
 library(RSQLite)
 library(DBI)
+library(here)
 
-con <- dbConnect(SQLite(), dbname = "data/raw/tiktok_students.sqlite")
+con <- dbConnect(
+  SQLite(),
+  dbname = here("data", "raw", "tiktok_students.sqlite")
+)
 print(dbListTables(con))
 combined_data <- dbGetQuery(con, "
   SELECT 

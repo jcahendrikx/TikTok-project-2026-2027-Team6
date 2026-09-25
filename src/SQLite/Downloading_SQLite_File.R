@@ -1,5 +1,12 @@
 # Download SQLite file from the provided URL
 url <- "https://filesender.surf.nl/download.php??token=29803da2-2322-4844-aebf-7e0b95129957&files_ids=38390042"
+
+dir.create(
+  "data/raw",
+  recursive = TRUE,
+  showWarnings = FALSE
+)
+
 destination_file <- "data/raw/tiktok_students.sqlite"
 
 
