@@ -10,4 +10,7 @@ src/Session_analysis_alex/TikTok_Sessions_Analysis_Alex_files/
 src/Final_Analysis_Summary.html
 src/Summary_videos_files/
 
-
+# Quarto-generated files
+src/.gitignore
+src/.quarto/
+src/**/*.quarto_ipynb

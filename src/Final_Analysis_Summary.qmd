@@ -713,8 +713,7 @@ There are no missing, zero or negative values in the variables used, and every s
 
 ## Modelling sample and variables
 
-The modelling sample keeps sessions with valid values on all variables. The login hour (UTC) is extracted from the login time. Both session duration and videos viewed are right-skewed, so both are transformed with $\log(1 + x)$. The coefficient of interest is then interpreted as an approximate elasticity: the percentage change in videos viewed associated with a one percent change in session duration.
-
+The modelling sample keeps sessions with valid values on all variables. The login hour (UTC) is extracted from the login time. Both session duration and videos viewed are right-skewed, so both are transformed with $\log(1 + x)$. Because both variables are transformed using log(1 + x), the coefficient should not be interpreted as an exact elasticity of the raw variables. Instead, it captures a strong positive association between session duration and the number of videos viewed on the transformed scales.
 ```{r}
 #| label: reg-model-data
 
