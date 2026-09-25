@@ -1,6 +1,6 @@
 # Regression analysis: session duration and videos viewed
 
-
+install.packages("fixest")
 # %%
 
 library(tidyverse)
@@ -217,7 +217,9 @@ duration_distribution_plot <- ggplot(
   )
 ) +
   geom_histogram(
-    bins = 40
+    bins = 40,
+    fill = "lightblue",
+    color = "black"
   ) +
   labs(
     title = "Distribution of Session Duration",
@@ -226,7 +228,6 @@ duration_distribution_plot <- ggplot(
     y = "Number of Sessions"
   ) +
   theme_minimal()
-
 
 # Show the distribution of session duration on the transformed regression scale.
 
@@ -254,7 +255,6 @@ relationship_plot <- ggplot(
     y = "Log(1 + Videos Viewed)"
   ) +
   theme_minimal()
-
 
 # Visualise the raw relationship between session duration and videos viewed.
 

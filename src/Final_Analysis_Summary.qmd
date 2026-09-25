@@ -1,0 +1,1150 @@
+---
+title: "Final Analysis Summary"
+subtitle: "TikTok engagement data: data inspection, summary analyses and regression"
+author:
+  - Alex Hendrikx
+  - Nanyun Zhang
+date: today
+format:
+  pdf:
+    documentclass: scrartcl
+    papersize: a4
+    fontsize: 10pt
+    geometry:
+      - margin=2.2cm
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+    fig-format: png
+    fig-dpi: 200
+    fig-width: 6.5
+    fig-height: 4
+    fig-align: center
+    include-in-header:
+      text: |
+        \usepackage{etoolbox}
+        \AtBeginEnvironment{Highlighting}{\footnotesize}
+        \AtBeginEnvironment{verbatim}{\footnotesize}
+project:
+  type: default
+  output-dir: ../output/final_report
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+library(here)
+library(fixest)
+library(knitr)
+
+options(width = 82, dplyr.summarise.inform = FALSE)
+
+# All figures and tables produced by this report are written to output/.
+# The folders are created here so the document also runs on a fresh clone.
+for (folder in c("session_analysis", "watch_events", "regression", "final_report")) {
+  dir.create(here("output", folder), recursive = TRUE, showWarnings = FALSE)
+}
+```
+
+# Project Overview {.unnumbered}
+
+**Project completed by:** Data Preparation & Programming Team 6
+
+- Alex Hendrikx
+- Nanyun Zhang
+
+This report brings together the work of the previous issues in one document. It contains the basic inspection of the three datasets (@sec-inspection), the summary analyses of the video, session and watch-event data (@sec-summaries), the regression of videos viewed on session duration (@sec-regression), and our conclusions (@sec-conclusions). Every table, figure and number in this report is produced by the code chunks in this file, so re-rendering the document reproduces the whole PDF (see Appendix B).
+
+# Data Downloading & Cleaning
+
+For each dataset, we downloaded the raw files from the specified sources, verified file integrity, and removed duplicates. We then standardized column names, handled missing values, and ensured consistent data types across all tables. Finally, we performed basic validation checks to confirm the cleaned data was ready for analysis. The exact codes are recorded in the respective downloading and cleaning files:
+
+1. Video View:
+
+    - `src/downloading_videodata_script.R`
+
+2. Sessions:
+
+    - `src/Session_analysis_alex/data_session_download.R`
+
+    - `src/Session_analysis_alex/data_session_cleaning.R`
+
+3. Watch Events:
+
+    - `src/watch_events_analysis/download_watch_events.R`
+
+    - `src/watch_events_analysis/cleaning_watch_events.R`
+
+This summary document focuses purely on the actual analyses and regressions performed, meaning that no more attention will be given on the data cleaning process.
+
+# Basic Data Inspection {#sec-inspection}
+
+This section loads the three datasets and takes a first look at their structure, missing values and coverage. The `here` package is used to locate the files from the project root, so the document can be rendered from any working directory.
+
+## Video views
+
+The video dataset is the raw file `data/raw/video_view.csv`, with one row per video.
+
+```{r}
+#| label: videos-load
+
+videos <- read.csv(here("data", "raw", "video_view.csv"))
+```
+
+```{r}
+#| label: videos-overview
+
+head(videos)
+glimpse(videos)
+```
+
+The output above shows the structure and contents of the dataset. The following check shows whether missing values are present in the main variables used in the analysis.
+
+```{r}
+#| label: videos-missing
+
+videos %>%
+  summarise(
+    missing_watch_rate = sum(is.na(watch_rate)),
+    missing_impressions = sum(is.na(impressions_n))
+  )
+```
+
+Missing watch rates occur for videos without any impressions (a rate cannot be computed without views), while `impressions_n` itself is always present.
+
+## Sessions
+
+The session dataset is the cleaned file `data/processed/cleaned_sessions.csv`, with one row per user session.
+
+```{r}
+#| label: sessions-load
+
+sessions <- read_csv(
+  here("data", "processed", "cleaned_sessions.csv"),
+  show_col_types = FALSE
+)
+
+head(sessions)
+summary(sessions)
+```
+
+## Watch events
+
+The watch-events dataset is the cleaned file `data/processed/watch_events_cleaned.csv`, with one row per video shown to a user.
+
+```{r}
+#| label: watch-events-load
+
+watch_events <- read_csv(
+  here("data", "processed", "watch_events_cleaned.csv"),
+  show_col_types = FALSE
+)
+
+head(watch_events)
+glimpse(watch_events)
+```
+
+
+# Summary Analyses {#sec-summaries}
+
+## Video views
+
+This part provides an overview of the TikTok video view dataset and summarizes several key performance indicators.
+
+### Summary statistics
+
+```{r}
+#| label: videos-summary-stats
+
+videos %>%
+  summarise(
+    number_of_videos = n(),
+    total_impressions = sum(impressions_n, na.rm = TRUE),
+    average_watch_rate = mean(watch_rate, na.rm = TRUE)
+  )
+```
+
+These summary statistics provide an overview of the number of videos, total impressions, and average watch rate in the dataset.
+
+### Creator summary
+
+```{r}
+#| label: videos-creator-summary
+
+creator_summary <- videos %>%
+  group_by(creator_id) %>%
+  summarise(
+    videos_n = n(),
+    impressions_total = sum(impressions_n, na.rm = TRUE),
+    watch_rate_avg = mean(watch_rate, na.rm = TRUE)
+  ) %>%
+  arrange(desc(impressions_total))
+
+creator_summary
+```
+
+The creator summary compares creators based on their number of videos, total impressions, and average watch rate (the first ten of the creators are shown).
+
+### Top 5 videos by impressions
+
+```{r}
+#| label: videos-top5
+
+videos %>%
+  arrange(desc(impressions_n)) %>%
+  select(video_id, creator_id, impressions_n, watch_rate) %>%
+  head(5)
+```
+
+This table identifies the five videos with the highest number of impressions.
+
+### Publishing date
+
+```{r}
+#| label: videos-publishing-date
+
+arranged_date <- videos %>%
+  mutate(publishing_date = as.POSIXct(published_at, origin = "1970-01-01", tz = "CET")) %>%
+  select(creator_id, video_id, publishing_date, watch_rate) %>%
+  arrange(publishing_date)
+
+head(arranged_date, 20)
+```
+
+The above code shows the earliest 20 videos inside of the dataset and their corresponding dates, derived from the UNIX code. The UNIX timestamps are converted into readable dates using the CET timezone.
+
+### Time between impressions
+
+```{r}
+#| label: videos-time-between-impressions
+
+time_between_impressions <- videos %>%
+  filter(!is.na(first_impression_at)) %>%
+  filter(!is.na(last_impression_at)) %>%
+  mutate(time_between_first_and_last_impression = last_impression_at - first_impression_at) %>%
+  mutate(hours_between_first_and_last_impression = time_between_first_and_last_impression / 3600) %>%
+  mutate(days_between_first_and_last_impression = hours_between_first_and_last_impression / 24) %>%
+  select(creator_id, video_id, impressions_n, days_between_first_and_last_impression, hours_between_first_and_last_impression) %>%
+  arrange(desc(hours_between_first_and_last_impression))
+
+head(time_between_impressions)
+```
+
+The above code first filters out videos with missing values for first and last impressions, then calculates the difference between the two, transforms this into hours and days, and finally arranges from largest gap between impressions to the smallest gap between first and last impressions.
+
+### Summary of the video analysis
+
+Overall, the analysis provides an overview of the TikTok video view dataset, including missing values, creator performance, publishing dates, impression duration, and the videos with the highest impressions. These summaries help identify differences in reach, engagement, and the timing of impressions across videos.
+
+## Sessions
+
+This part provides a visual overview of the TikTok Sessions dataset using several key performance indicators.
+
+### Distribution of videos watched per user
+
+```{r}
+#| label: fig-videos-per-user
+#| fig-cap: "Distribution of the total number of videos watched per user."
+
+user_totals <- sessions %>% # Aggregate videos watched per user
+  group_by(user_id) %>%
+  summarise(total_videos = sum(videos_viewed, na.rm = TRUE), .groups = "drop")
+
+ggplot(user_totals, aes(x = total_videos)) + # Plot the distribution as a histogram
+  geom_histogram(binwidth = 10, fill = "#6497b1", color = "white") +
+  labs(
+    title = "Distribution of User Video Viewing",
+    subtitle = "Bar Width = 10 Videos",
+    x = "Total Videos Watched",
+    y = "Number of Users"
+  ) +
+  theme_minimal()
+
+ggsave(here("output", "session_analysis", "histogram_videos_per_user.png"))
+```
+
+This histogram shows the distribution of total videos watched per user. Most users viewed around 100 videos, but there are several users with totals exceeding 300, resulting in a right-skewed distribution, rather than a symmetrical normal distribution.
+
+### Distribution of the number of sessions per user
+
+```{r}
+#| label: fig-sessions-per-user
+#| fig-cap: "Distribution of the number of sessions per user."
+
+session_counts <- sessions %>% # Count sessions per user
+  group_by(user_id) %>%
+  summarise(num_sessions = n(), .groups = "drop")
+
+ggplot(session_counts, aes(x = num_sessions)) +
+  geom_histogram(binwidth = 5, fill = "#6497b1", color = "white") +
+  labs(
+    title = "Distribution of Sessions per User",
+    subtitle = "Bar width = 5 Sessions",
+    x = "Number of Sessions",
+    y = "Number of Users"
+  ) +
+  theme_minimal()
+
+ggsave(here("output", "session_analysis", "histogram_sessions_per_user.png"))
+```
+
+This histogram shows the distribution of total watch sessions per user. Most users had around 30 watch sessions, but there are several users with total watch sessions exceeding 80, resulting in a right-skewed distribution, rather than a symmetrical normal distribution.
+
+### Sessions and videos watched per user
+
+A similar distribution is seen in the two graphs above, suggesting a possible association between the number of sessions and videos watched per user. Therefore, a scatter plot is used to examine this relationship further.
+
+```{r}
+#| label: fig-sessions-vs-videos
+#| fig-cap: "Total videos watched against the number of sessions, per user."
+
+user_summary <- sessions %>% # Recreate the two variables as they both existed in separate stored dataframes
+  group_by(user_id) %>%
+  summarise(
+    total_videos = sum(videos_viewed, na.rm = TRUE),
+    num_sessions = n(),
+    .groups = "drop"
+  )
+
+ggplot(user_summary, aes(x = num_sessions, y = total_videos)) +
+  geom_point(color = "#6497b1", alpha = 0.6, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed") +
+  labs(
+    title = "Scatterplot: Videos Watched vs Sessions per User",
+    x = "Number of Sessions",
+    y = "Total Videos Watched"
+  ) +
+  theme_minimal()
+
+ggsave(here("output", "session_analysis", "scatter_sessions_vs_videos.png"))
+```
+
+The scatter plot and the included black dashed regression line show a clear linear correlation between the number of sessions and number of videos watched. While this is no clear sign of causation, it can be argued that on average, when the number of sessions per user increases, the number of videos watched per user also increases.
+
+### Session duration and videos viewed
+
+```{r}
+#| label: fig-duration-vs-videos
+#| fig-cap: "Videos viewed against session duration, per session."
+
+ggplot(sessions, aes(x = session_duration_sec, y = videos_viewed)) +
+  geom_point(alpha = 0.4, color = "#6497b1") +
+  geom_smooth(method = "lm", se = FALSE, color = "black", linetype = "dashed") +
+  labs(title = "Session Duration vs. Videos Viewed", x = "Session Duration (sec)", y = "Videos Viewed") +
+  theme_minimal()
+
+ggsave(here("output", "session_analysis", "scatter_seconds_vs_videos.png"))
+```
+
+This scatter plot of the duration of each session versus the number of videos watched per session shows whether longer sessions are typically associated with watching more videos, as one would logically presume. This positive association does indeed exist, as shown by the upsloping black regression line. It is the relationship that @sec-regression examines with a regression.
+
+### Summary of the session analysis
+
+Most users show moderate engagement, but both videos watched and session counts are right-skewed with some highly active outliers. Clear positive correlations exist between session frequency, session duration, and the number of videos watched, highlighting that more active users tend to watch more content.
+
+## Watch events {#sec-watch-analysis}
+
+This part provides an overview of the TikTok watch events dataset, including user actions, watch duration, missing values, and timestamp formats.
+
+### Summary statistics
+
+```{r}
+#| label: tbl-watch-summary
+#| tbl-cap: "Summary statistics of the watch events."
+
+watch_summary <- watch_events %>%
+  summarise(
+    number_of_watch_events = n(),
+    number_of_users = n_distinct(user_id),
+    number_of_sessions = n_distinct(session_id),
+    number_of_videos = n_distinct(video_id),
+    number_of_creators = n_distinct(creator_id),
+    average_watch_seconds = mean(watch_seconds, na.rm = TRUE),
+    median_watch_seconds = median(watch_seconds, na.rm = TRUE)
+  )
+
+watch_summary %>%
+  pivot_longer(everything(), names_to = "statistic", values_to = "value") %>%
+  kable(digits = 1, format.args = list(big.mark = ","))
+```
+
+The cleaned dataset contains 93,211 watch events from 724 users across 25,202 sessions, covering 4,199 videos from 218 creators. Among observations with available watch duration, the average watch time is 12.4 seconds and the median is 8 seconds. The higher mean compared with the median suggests that some longer watch events increase the average duration.
+
+### Distribution of watch actions
+
+```{r}
+#| label: fig-action-distribution
+#| fig-cap: "Distribution of user actions across all watch events."
+
+action_summary <- watch_events %>%
+  count(action, sort = TRUE) %>%
+  mutate(
+    percentage = n / sum(n) * 100
+  )
+
+action_summary
+
+action_plot <- ggplot(
+  action_summary %>%
+    mutate(
+      action = forcats::fct_recode(
+        action,
+        "Skip Immediate" = "skip_immediate",
+        "Skip After Partial" = "skip_after_partial",
+        "Watch Full" = "watch_full",
+        "Exit Platform" = "exit_platform"
+      )
+    ),
+  aes(x = reorder(action, n), y = n)
+) +
+  geom_col(fill = "lightblue") +
+  coord_flip() +
+  labs(
+    title = "Distribution of Watch Event Actions",
+    x = "Action",
+    y = "Number of Events"
+  ) +
+  theme_minimal()
+
+action_plot
+
+ggsave(
+  filename = here("output", "watch_events", "action_distribution.png"),
+  plot = action_plot,
+  width = 8,
+  height = 5
+)
+```
+
+```{r}
+#| label: action-shares
+#| include: false
+
+action_pct <- setNames(round(action_summary$percentage, 1), action_summary$action)
+```
+
+The four watch actions occur at very similar frequencies. As rows with missing data for `watch_seconds` were removed, except for those with the action `skip_immediate`, which were logically set to 0, `skip_immediate` is the most common action within the cleaned dataset with `r action_pct["skip_immediate"]`% of all rows. `exit_platform` is the second most common action at `r action_pct["exit_platform"]`%, followed by `watch_full` at `r action_pct["watch_full"]`%, while `skip_after_partial` accounts for `r action_pct["skip_after_partial"]`%. Overall, no single action strongly dominates the watch events.
+
+### Watch time by action
+
+```{r}
+#| label: watch-time-summary
+
+watch_time_summary <- watch_events %>%
+  group_by(action) %>%
+  summarise(
+    number_of_observations = n(),
+    average_watch_seconds = mean(watch_seconds),
+    median_watch_seconds = median(watch_seconds),
+    minimum_watch_seconds = min(watch_seconds),
+    maximum_watch_seconds = max(watch_seconds)
+  ) %>%
+  arrange(desc(average_watch_seconds))
+
+watch_time_summary
+```
+
+Watch duration is summarized separately for each user action.
+
+```{r}
+#| label: fig-watch-time-by-action
+#| fig-cap: "Distribution of watch duration across the four user actions."
+
+watch_time_plot <- watch_events %>%
+  ggplot(
+    aes(
+      x = action,
+      y = watch_seconds
+    )
+  ) +
+  geom_boxplot() +
+  scale_x_discrete(
+    labels = function(x) {
+      str_to_title(str_replace_all(x, "_", " "))
+    }
+  ) +
+  labs(
+    title = "Watch Duration by User Action",
+    x = "Action",
+    y = "Watch Time (seconds)"
+  ) +
+  theme_minimal()
+
+watch_time_plot
+
+ggsave(
+  filename = here("output", "watch_events", "watch_time_by_action.png"),
+  plot = watch_time_plot,
+  width = 8,
+  height = 5
+)
+```
+
+Watch duration differs substantially across the four user actions. `watch_full` events have the longest watch duration, with an average of 30.1 seconds and a median of 30 seconds. `skip_after_partial` events have an average duration of 14.4 seconds with a median of 13 seconds, while `exit_platform` events average 6.07 seconds and have a median of 6 seconds. As expected, `skip_immediate` events have a mean and median watch duration of 0 seconds. Overall, the watch-duration patterns are clearly consistent with the different types of user action.
+
+### Session-level engagement
+
+```{r}
+#| label: tbl-session-level
+#| tbl-cap: "Session-level engagement in the watch-events data."
+
+session_level <- watch_events %>%
+  group_by(
+    session_id,
+    user_id
+  ) %>%
+  summarise(
+    number_of_events = n(),
+
+    total_watch_seconds = if_else(
+      all(is.na(watch_seconds)),
+      NA_real_,
+      sum(watch_seconds, na.rm = TRUE)
+    ),
+
+    missing_watch_events = sum(
+      is.na(watch_seconds)
+    ),
+
+    .groups = "drop"
+  )
+
+session_summary <- session_level %>%
+  summarise(
+    number_of_sessions = n(),
+    average_events_per_session = mean(number_of_events),
+    median_events_per_session = median(number_of_events),
+
+    average_watch_seconds_per_session = mean(
+      total_watch_seconds,
+      na.rm = TRUE
+    ),
+
+    median_watch_seconds_per_session = median(
+      total_watch_seconds,
+      na.rm = TRUE
+    )
+  )
+
+session_summary %>%
+  pivot_longer(everything(), names_to = "statistic", values_to = "value") %>%
+  kable(digits = 1, format.args = list(big.mark = ","))
+```
+
+The cleaned dataset contains 25,202 user sessions. A session contains an average of 3.7 watch events, with a median of 3 events. The average observed watch time per session is 46.0 seconds, while the median is 30 seconds. The higher averages compared with the medians suggest that most sessions are relatively short, while a smaller number of longer sessions increase the overall averages.
+
+```{r}
+#| label: fig-events-per-session
+#| fig-cap: "Distribution of the number of watch events within each user session."
+
+session_events_plot <- ggplot(
+  session_level,
+  aes(x = number_of_events)
+) +
+  geom_histogram(
+    binwidth = 1,
+    boundary = 0,
+    fill = "#87CEEB",
+    color = "black"
+  ) +
+  labs(
+    title = "Number of Watch Events per Session",
+    x = "Number of Watch Events",
+    y = "Number of Sessions"
+  ) +
+  theme_minimal()
+
+session_events_plot
+
+ggsave(
+  filename = here("output", "watch_events", "events_per_session.png"),
+  plot = session_events_plot,
+  width = 8,
+  height = 5
+)
+```
+
+Most user sessions contain only a small number of watch events, with one-event sessions occurring most frequently. Here, one watch event is defined as one viewer seeing a specific video 1 time. The number of sessions decreases rapidly as the number of watch events increases, producing a strongly right-skewed distribution. A relatively small number of sessions contain many watch events, which helps explain why the average number of events per session is higher than the median.
+
+### Time-of-day behavior {#sec-time-of-day}
+
+```{r}
+#| label: hourly-activity-summary
+
+hourly_activity <- watch_events %>%
+  mutate(
+    hour = as.integer(
+      format(
+        started_at_normalized,
+        "%H"
+      )
+    )
+  ) %>%
+  group_by(hour) %>%
+  summarise(
+    number_of_events = n(),
+    average_watch_seconds = mean(
+      watch_seconds,
+      na.rm = TRUE
+    ),
+    .groups = "drop"
+  ) %>%
+  arrange(hour)
+
+print(hourly_activity, n = Inf)
+```
+
+The normalized timestamps are used to examine how watch activity varies across the 24 hours of the day. The hourly values are based on the UTC timestamps used in the dataset.
+
+```{r}
+#| label: hourly-date-coverage
+
+hourly_date_coverage <- watch_events %>%
+  mutate(
+    date = as.Date(started_at_normalized),
+    hour = as.integer(
+      format(started_at_normalized, "%H")
+    )
+  ) %>%
+  group_by(hour) %>%
+  summarise(
+    number_of_events = n(),
+    number_of_dates = n_distinct(date),
+    .groups = "drop"
+  ) %>%
+  arrange(hour)
+
+print(hourly_date_coverage, n = Inf)
+```
+
+Hours 0 through 21 are represented on all 60 dates in the dataset. In contrast, hour 22 appears on only 58 dates and contains substantially fewer events, while hour 23 is absent entirely. Because the dataset alone does not indicate whether this pattern reflects user behavior or the observation process, hours 22 and 23 are excluded from the main time-of-day comparison.
+
+```{r}
+#| label: fig-hourly-watch-activity
+#| fig-cap: "Number of watch events by hour of day for hours represented on all 60 dates."
+
+hourly_activity_complete <- hourly_activity %>%
+  filter(hour <= 21)
+
+hourly_activity_plot <- ggplot(
+  hourly_activity_complete,
+  aes(
+    x = hour,
+    y = number_of_events
+  )
+) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(
+    breaks = 0:21
+  ) +
+  labs(
+    title = "Watch Activity by Hour of Day",
+    x = "Hour of Day (UTC)",
+    y = "Number of Watch Events"
+  ) +
+  theme_minimal()
+
+hourly_activity_plot
+
+ggsave(
+  filename = here("output", "watch_events", "hourly_watch_activity.png"),
+  plot = hourly_activity_plot,
+  width = 8,
+  height = 5
+)
+```
+
+Across the fully observed hours from 00:00 to 21:00 UTC, watch activity remains relatively stable, with approximately 3,900 to 4,500 events per hour. Although some local peaks and dips are visible, there is no strong overall time-of-day pattern. Average watch duration is also highly consistent across hours, remaining close to 12--13 seconds.
+
+Hours 22 and 23 are not included in the main comparison because they are not represented consistently across the 60 dates. Their lower event counts therefore should not be interpreted directly as evidence of lower user activity.
+
+### Summary of the watch-events analysis
+
+The cleaned watch-events dataset contains 93,211 observations across 25,202 user sessions. The four watch actions occur at similar frequencies, with no single action dominating the dataset.
+
+Watch duration differs clearly by action. Full-watch events have the longest observed duration, while immediate skips have a watch duration of zero. Partial skips and platform exits fall between these two extremes.
+
+At the session level, users generate a median of 3 watch events and 30 seconds of observed watch time per session. Session activity is strongly right-skewed, with most sessions containing only a few watch events and a smaller number of much longer sessions.
+
+Across hours 0 through 21, which are represented on all 60 dates, watch activity and average watch duration remain relatively stable, with no strong time-of-day pattern.
+
+# Regression Analysis {#sec-regression}
+
+This section examines the relationship between session duration and the number of videos viewed in a session. It uses the sessions file only. The regressions use user-clustered standard errors, and the final specification also includes user fixed effects, which absorb all stable differences between users.
+
+## Data checks
+
+Before modelling, the completeness and validity of the variables needed for the regression are checked.
+
+```{r}
+#| label: tbl-reg-data-check
+#| tbl-cap: "Completeness and validity checks for the regression variables."
+
+data_check <- sessions %>%
+  summarise(
+    total_sessions = n(),
+    unique_sessions = n_distinct(session_id),
+    unique_users = n_distinct(user_id),
+    missing_session_duration = sum(is.na(session_duration_sec)),
+    missing_videos_viewed = sum(is.na(videos_viewed)),
+    missing_user_id = sum(is.na(user_id)),
+    missing_login_time = sum(is.na(login_at)),
+    zero_session_duration = sum(session_duration_sec == 0, na.rm = TRUE),
+    zero_videos_viewed = sum(videos_viewed == 0, na.rm = TRUE),
+    negative_session_duration = sum(session_duration_sec < 0, na.rm = TRUE),
+    negative_videos_viewed = sum(videos_viewed < 0, na.rm = TRUE)
+  )
+
+data_check %>%
+  pivot_longer(everything(), names_to = "check", values_to = "count") %>%
+  kable(format.args = list(big.mark = ","))
+```
+
+There are no missing, zero or negative values in the variables used, and every session is unique.
+
+## Modelling sample and variables
+
+The modelling sample keeps sessions with valid values on all variables. The login hour (UTC) is extracted from the login time. Both session duration and videos viewed are right-skewed, so both are transformed with $\log(1 + x)$. Because both variables are transformed using log(1 + x), the coefficient should not be interpreted as an exact elasticity of the raw variables. Instead, it captures a strong positive association between session duration and the number of videos viewed on the transformed scales.
+```{r}
+#| label: reg-model-data
+
+model_data <- sessions %>%
+  mutate(
+    login_datetime = as.POSIXct(login_at, tz = "UTC"),
+    login_hour = as.integer(format(login_datetime, "%H"))
+  ) %>%
+  filter(
+    !is.na(session_duration_sec),
+    !is.na(videos_viewed),
+    !is.na(user_id),
+    !is.na(login_datetime),
+    session_duration_sec >= 0,
+    videos_viewed >= 0
+  ) %>%
+  mutate(
+    log_session_duration = log1p(session_duration_sec),
+    log_videos_viewed = log1p(videos_viewed)
+  )
+
+nrow(model_data)
+```
+
+No sessions are dropped by these filters. The descriptive statistics of the main analysis variables are shown below.
+
+```{r}
+#| label: tbl-reg-descriptives
+#| tbl-cap: "Descriptive statistics of the main analysis variables."
+
+descriptive_statistics <- tibble(
+  variable = c("Session duration (seconds)", "Videos viewed", "Login hour (UTC)"),
+  n = c(
+    sum(!is.na(model_data$session_duration_sec)),
+    sum(!is.na(model_data$videos_viewed)),
+    sum(!is.na(model_data$login_hour))
+  ),
+  mean = c(
+    mean(model_data$session_duration_sec),
+    mean(model_data$videos_viewed),
+    mean(model_data$login_hour)
+  ),
+  median = c(
+    median(model_data$session_duration_sec),
+    median(model_data$videos_viewed),
+    median(model_data$login_hour)
+  ),
+  sd = c(
+    sd(model_data$session_duration_sec),
+    sd(model_data$videos_viewed),
+    sd(model_data$login_hour)
+  ),
+  min = c(
+    min(model_data$session_duration_sec),
+    min(model_data$videos_viewed),
+    min(model_data$login_hour)
+  ),
+  max = c(
+    max(model_data$session_duration_sec),
+    max(model_data$videos_viewed),
+    max(model_data$login_hour)
+  )
+)
+
+kable(descriptive_statistics, digits = 2, format.args = list(big.mark = ","))
+```
+
+## Exploratory plots
+
+The first plot shows the distribution of session duration on the transformed scale used in the regression.
+
+```{r}
+#| label: fig-reg-duration-distribution
+#| fig-cap: "Distribution of session duration on the log-transformed scale used in the regression."
+
+duration_distribution_plot <- ggplot(
+  model_data,
+  aes(x = log_session_duration)
+) +
+  geom_histogram(bins = 40, fill = "lightblue", color = "black") +
+  labs(
+    title = "Distribution of Session Duration",
+    subtitle = "Displayed on the log-transformed scale used in the regression",
+    x = "Log(1 + Session Duration in Seconds)",
+    y = "Number of Sessions"
+  ) +
+  theme_minimal()
+
+duration_distribution_plot
+```
+
+The second plot shows the raw relationship between session duration and videos viewed, before accounting for time of day and user differences.
+
+```{r}
+#| label: fig-reg-relationship
+#| fig-cap: "Raw association between log session duration and log videos viewed."
+
+relationship_plot <- ggplot(
+  model_data,
+  aes(x = log_session_duration, y = log_videos_viewed)
+) +
+  geom_point(alpha = 0.05) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Session Duration and Videos Viewed",
+    subtitle = "Raw association before accounting for time of day and user differences",
+    x = "Log(1 + Session Duration in Seconds)",
+    y = "Log(1 + Videos Viewed)"
+  ) +
+  theme_minimal()
+
+relationship_plot
+```
+
+Videos viewed is a whole number between 1 and 30, which is why the points form horizontal bands. The relationship is strongly positive.
+
+Video viewing is then summarised across session start times, to check whether engagement differs across times of day.
+
+```{r}
+#| label: tbl-reg-hourly
+#| tbl-cap: "Videos viewed by session start hour (UTC)."
+
+hourly_summary <- model_data %>%
+  group_by(login_hour) %>%
+  summarise(
+    number_of_sessions = n(),
+    average_videos_viewed = mean(videos_viewed, na.rm = TRUE),
+    median_videos_viewed = median(videos_viewed, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+kable(hourly_summary, digits = 2, format.args = list(big.mark = ","))
+```
+
+```{r}
+#| label: fig-reg-time-of-day
+#| fig-cap: "Average videos viewed by session start hour (UTC)."
+
+time_of_day_plot <- ggplot(
+  hourly_summary,
+  aes(x = login_hour, y = average_videos_viewed)
+) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = 0:23) +
+  labs(
+    title = "Average Videos Viewed by Session Start Time",
+    subtitle = "Session start times are measured in UTC",
+    x = "Login Hour (UTC)",
+    y = "Average Videos Viewed"
+  ) +
+  theme_minimal()
+
+time_of_day_plot
+```
+
+The average number of videos per session hardly varies by hour (between 3.8 and 4.0). The vertical axis does not start at zero, so the visible differences look larger than they are. Hour 22 contains only about a fifth of the sessions of other hours, and hour 23 is absent, the same pattern as in the watch events (@sec-time-of-day).
+
+## Models
+
+Three specifications are estimated. All use the log of videos viewed as the outcome and standard errors clustered by user.
+
+1. **Model 1 (baseline):** log videos viewed on log session duration.
+2. **Model 2:** adds login-hour dummies to control for time of day.
+3. **Model 3:** adds user fixed effects, so that the coefficient is identified from differences between sessions of the same user.
+
+```{r}
+#| label: reg-model-1
+
+model_1 <- feols(
+  log_videos_viewed ~ log_session_duration,
+  data = model_data,
+  vcov = ~ user_id
+)
+
+summary(model_1)
+```
+
+```{r}
+#| label: reg-model-2
+
+model_2 <- feols(
+  log_videos_viewed ~ log_session_duration + i(login_hour),
+  data = model_data,
+  vcov = ~ user_id
+)
+```
+
+```{r}
+#| label: reg-model-3
+
+model_3 <- feols(
+  log_videos_viewed ~ log_session_duration + i(login_hour) | user_id,
+  data = model_data,
+  vcov = ~ user_id
+)
+```
+
+The full output of Models 2 and 3, including all login-hour coefficients, is reported in Appendix A. The main coefficient of each model is compared below.
+
+```{r}
+#| label: reg-model-comparison
+
+extract_model_effect <- function(fitted_model, model_name) {
+  coefficient <- coeftable(fitted_model)["log_session_duration", ]
+
+  tibble(
+    model = model_name,
+    estimate = unname(coefficient["Estimate"]),
+    clustered_std_error = unname(coefficient["Std. Error"]),
+    p_value = unname(coefficient["Pr(>|t|)"]),
+    observations = nobs(fitted_model),
+    adjusted_r_squared = unname(r2(fitted_model, "ar2"))
+  )
+}
+
+model_comparison <- bind_rows(
+  extract_model_effect(model_1, "Model 1: Baseline"),
+  extract_model_effect(model_2, "Model 2: + Time of day"),
+  extract_model_effect(model_3, "Model 3: + User fixed effects")
+) %>%
+  mutate(
+    time_of_day_control = c("No", "Yes", "Yes"),
+    user_fixed_effects = c("No", "No", "Yes"),
+    ci_lower = estimate - 1.96 * clustered_std_error,
+    ci_upper = estimate + 1.96 * clustered_std_error
+  )
+```
+
+```{r}
+#| label: tbl-reg-model-comparison
+#| tbl-cap: "Coefficient on log session duration across the three specifications (standard errors clustered by user)."
+
+model_comparison %>%
+  transmute(
+    Model = model,
+    Estimate = estimate,
+    `Clustered SE` = clustered_std_error,
+    `p-value` = if_else(p_value < 0.001, "< 0.001", format(round(p_value, 3))),
+    `95% CI` = sprintf("[%.3f, %.3f]", ci_lower, ci_upper),
+    N = format(observations, big.mark = ","),
+    `Adj. R2` = adjusted_r_squared
+  ) %>%
+  kable(digits = c(NA, 3, 4, NA, NA, NA, 3), align = "lrrrrrr")
+```
+
+The estimated coefficient on log session duration is 0.480 in all three specifications, with a very narrow confidence interval. Adding time-of-day controls and user fixed effects leaves it unchanged. The p-values are reported as "< 0.001". Model 3 has five fewer observations because five users have only a single session, which cannot be used with user fixed effects.
+
+```{r}
+#| label: fig-reg-coefficients
+#| fig-cap: "Coefficient on log session duration across the three models, with 95% confidence intervals."
+
+coefficient_plot <- ggplot(
+  model_comparison,
+  aes(x = model, y = estimate)
+) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.15) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Estimated Association Across Regression Models",
+    subtitle = "95% confidence intervals use standard errors clustered by user",
+    x = NULL,
+    y = "Coefficient on Log Session Duration"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 20, hjust = 1))
+
+coefficient_plot
+```
+
+The clustered inference for the main coefficient in the final model (Model 3) is:
+
+```{r}
+#| label: reg-final-result
+
+final_result <- coeftable(model_3)["log_session_duration", ]
+
+print(final_result)
+```
+
+## Diagnostics
+
+Residuals and fitted values are taken from the final fixed-effects model. To keep the plots efficient, a reproducible random subset of 20,000 residuals is plotted.
+
+```{r}
+#| label: reg-diagnostic-data
+
+diagnostic_data <- tibble(
+  fitted_values = fitted(model_3),
+  residuals = resid(model_3)
+)
+
+set.seed(123)
+
+diagnostic_plot_data <- diagnostic_data %>%
+  slice_sample(n = min(20000, nrow(diagnostic_data)))
+```
+
+```{r}
+#| label: fig-reg-residuals
+#| fig-cap: "Residuals against fitted values for the final model (random sample of 20,000)."
+
+residual_plot <- ggplot(
+  diagnostic_plot_data,
+  aes(x = fitted_values, y = residuals)
+) +
+  geom_point(alpha = 0.08) +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Residuals vs Fitted Values",
+    subtitle = "Diagnostic plot based on a random sample of model residuals",
+    x = "Fitted Values",
+    y = "Residuals"
+  ) +
+  theme_minimal()
+
+residual_plot
+```
+
+The residuals are centred on zero across the range of fitted values. They lie on diagonal lines because the outcome takes only whole-number values (1 to 30) before the log transformation, so each line corresponds to one value of videos viewed.
+
+```{r}
+#| label: fig-reg-qq
+#| fig-cap: "Q-Q plot of the residuals of the final model (random sample of 20,000)."
+
+qq_plot <- ggplot(
+  diagnostic_plot_data,
+  aes(sample = residuals)
+) +
+  stat_qq(alpha = 0.15) +
+  stat_qq_line() +
+  labs(
+    title = "Q-Q Plot of Regression Residuals",
+    subtitle = "Diagnostic plot based on a random sample of model residuals",
+    x = "Theoretical Quantiles",
+    y = "Sample Quantiles"
+  ) +
+  theme_minimal()
+
+qq_plot
+```
+
+The residuals follow the normal line closely in the centre and have lighter tails than a normal distribution. Neither diagnostic plot indicates a problem for the linear model, and the clustered standard errors do not rely on normal residuals in any case.
+
+## Saving figures and tables
+
+The regression figures and result tables are saved to `output/regression/`, so they can be reused outside this report.
+
+```{r}
+#| label: reg-save-outputs
+
+figures <- list(
+  session_duration_distribution = duration_distribution_plot,
+  session_duration_vs_videos = relationship_plot,
+  videos_viewed_by_login_hour = time_of_day_plot,
+  model_coefficient_comparison = coefficient_plot,
+  residuals_vs_fitted = residual_plot,
+  residual_qq_plot = qq_plot
+)
+
+for (name in names(figures)) {
+  ggsave(
+    filename = here("output", "regression", paste0(name, ".png")),
+    plot = figures[[name]],
+    width = 8,
+    height = 5
+  )
+}
+
+write_csv(descriptive_statistics, here("output", "regression", "descriptive_statistics.csv"))
+write_csv(hourly_summary, here("output", "regression", "hourly_summary.csv"))
+write_csv(model_comparison, here("output", "regression", "model_comparison.csv"))
+```
+
+# Conclusions {#sec-conclusions}
+
+```{r}
+#| label: conclusion-numbers
+#| include: false
+
+beta <- coef(model_3)["log_session_duration"]
+```
+
+**What the inspection showed.** The three datasets are complete and consistent in the variables we use: the cleaned session data has no missing, zero or negative values for the regression variables, and missing watch rates in the video data only occur for videos without impressions. Usage is strongly right-skewed (most sessions are short, a few users and sessions are very long), the four watch actions occur about equally often, and watch activity is stable across the day. Importantly, hour 22 (UTC) is only partially observed while hour 23 is absent, so the data appear to have a daily cut-off shortly after 22:00 UTC.
+
+**What the regression showed.** Longer sessions go together with more videos viewed. The coefficient of `r sprintf("%.2f", beta)` means that a 10% longer session is associated with roughly `r sprintf("%.1f", (1.1^beta - 1) * 100)`% more videos viewed. The estimate is the same with and without time-of-day controls and user fixed effects, so it does not come from differences between users or from the time of day. The model explains a large part of the variation (adjusted R² of about `r sprintf("%.2f", model_comparison$adjusted_r_squared[3])`).
+
+**Caveats.**
+
+- *The relationship is more than likely mechanical, not behavioural.* A session is mostly the videos watched in it, so the strong association is expected and should not be read as one variable causing the other. The regression has a direction (videos on duration) only by convention.
+- *The estimate is an association.* Fixed effects remove stable differences between users, but not anything that varies from session to session, and nothing here identifies a causal effect.
+- *The functional form is an approximation.* Videos viewed is a whole number between 1 and 30, which explains the banded residuals. The log(1 + x) transformation handles this reasonably well, but a count-data model (e.g. Poisson regression with fixed effects) would be a natural robustness check. An elasticity below one is partly a consequence of the transformation and of every session containing at least one video.
+- *The very small standard errors should not be over-interpreted.* With almost 100,000 sessions and a near-mechanical relationship, statistical significance is guaranteed, so the size of the coefficient and the fit matter more than the p-value.
+
+
+# Appendix A: Full regression output {.unnumbered}
+
+The full output of Model 2 and Model 3, including the coefficients of all login-hour dummies (hour 0 is the reference category).
+
+```{r}
+#| label: appendix-model-2
+
+summary(model_2)
+```
+
+```{r}
+#| label: appendix-model-3
+
+summary(model_3)
+```
+
+# Appendix B: Reproducibility {.unnumbered #sec-repro}
+
+This report is fully reproducible from the project root. The `here` package finds the root through the file `.here`, so the input paths do not depend on the working directory. The document expects the following files:
+
+- `data/raw/video_view.csv`
+- `data/processed/cleaned_sessions.csv`
+- `data/processed/watch_events_cleaned.csv`
+
+The PDF is rendered with Quarto (with a LaTeX installation, for example TinyTeX) from the project root using:
+
+```
+quarto render src/Final_Analysis_Summary.qmd --to pdf --output-dir ../output/final_report
+```
+
+The R packages needed are `tidyverse`, `here`, `fixest` and `knitr`. The intermediate figures and tables are written to `output/session_analysis/`, `output/watch_events/` and `output/regression/`, and the final PDF to `output/final_report/`. The session information of the render is shown below.
+
+```{r}
+#| label: session-info
+
+sessionInfo()
+```

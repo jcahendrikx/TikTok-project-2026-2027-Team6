@@ -68,6 +68,11 @@ The R packages used across the workflows include:
 - tidyverse
 - here
 - janitor
+- RSQLite
+- DBI
+- tinytex
+- knitr
+- fixest
 
 The required R packages can be installed using:
 
@@ -75,6 +80,10 @@ The required R packages can be installed using:
 install.packages("tidyverse")
 install.packages("here")
 install.packages("janitor")
+install.packages("RSQLite")
+install.packages("fixest")
+install.packages("tinytex")
+install.packages("knitr")
 ```
 
 ## Reproducing the Project
