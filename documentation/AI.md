@@ -59,6 +59,14 @@
 
 ## Assignment 4
 
+### ChatGPT
+#### Version & Settings
+- Model: GPT-5.6 Sol
+- Settings: Default Chat Settings
+
+#### Tool Usage
+
+
 ### Tilly AI
 #### Version & Settings
 - Model: Claude
@@ -67,3 +75,10 @@
 - Assisted with resolving merging conflicts after issues with versioning on Git
 - Assisted with the SQL code to select the relevant table columns
 - Assisted with the formatting options to create a PDF file for the final analysis
+- Assisted in interpretating some of the regression plots (e.g., residual plot and QQplot)
+- Enhanced formattting of the PDF file
+
+#### Output Validation
+- Code was always checked before implementing it directly
+- Interpretations of graphs were cross-validated using course knowledge and literature
+- The resulting improved formatted document was checked for inconsistencies in both the formatting and for possibly changed interpretation texts
