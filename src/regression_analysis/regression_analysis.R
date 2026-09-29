@@ -1,6 +1,5 @@
 # Regression analysis: session duration and videos viewed
 
-install.packages("fixest")
 # %%
 
 library(tidyverse)
