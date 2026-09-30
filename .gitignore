@@ -1,10 +1,12 @@
-#Subfolders
+# Subfolders
 data/
 output/
 
-#src files
+# Src Files
 src/watch_events_analysis/Summary_watch_events.html
 src/watch_events_analysis/Summary_watch_events_files/
+src/watch_events_analysis/README.html
+src/watch_events_analysis/README_files/
 src/Session_analysis_alex/TikTok_Sessions_Analysis_Alex.html
 src/Session_analysis_alex/TikTok_Sessions_Analysis_Alex_files/
 src/SQLite/SQL_Summary.html
@@ -13,7 +15,16 @@ src/Final_Analysis_Summary.html
 src/Summary_videos.html
 src/Summary_videos_files/
 
-# Quarto-generated files
+# Documentation Files
+documentation/AI_files/
+documentation/AI.html
+documentation/Feedback_WatchSessions.html
+
+# Final Output Generated Files
 src/.gitignore
 src/.quarto/
 src/**/*.quarto_ipynb
+
+# Others
+README_files/
+README.html
