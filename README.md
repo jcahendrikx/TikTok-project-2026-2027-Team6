@@ -62,7 +62,7 @@ data/processed/watch_events_cleaned.csv
 data/raw/tiktok_students.sqlite
 ```
 
-The SQLite database is used for the SQL summary analysis. Some of the main analyses continue to use the CSV datasets because the tables required for those analyses are not available in the SQLite database.
+The SQLite database is used for the SQL summary analysis. The main analyses continue to use the CSV datasets because the tables required for those analyses are not available in the SQLite database.
 
 The `data/` folder is ignored by Git, so downloaded datasets and the SQLite database are not committed to the repository.
 
