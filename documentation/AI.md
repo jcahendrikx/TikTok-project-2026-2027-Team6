@@ -65,6 +65,16 @@
 - Settings: Default Chat Settings
 
 #### Tool Usage
+- Used ChatGPT mainly as a debugging and review assistant while working on the regression analysis, Makefile automation, and final README.
+- I first attempted to write and adapt the code myself. When parts of the code did not run as expected, I asked ChatGPT to help interpret the errors and suggest possible alternative implementations or fixes.
+- Used ChatGPT to check Git/GitHub workflow steps, including branches, pull requests, merging, and repository organization.
+- Used ChatGPT to review the final project structure and assignment requirements and identify possible missing or inconsistent elements before submission.
+
+#### Output Validation
+- AI suggestions were not implemented automatically. Proposed fixes were reviewed first and only retained when they matched the project structure and assignment requirements.
+- Any code changes suggested by ChatGPT were tested locally before being committed.
+- The automated workflow was validated by running `make clean` followed by `make`, and by checking that a second `make` did not unnecessarily rerun completed steps.
+- The final AI review was treated as an additional check rather than as proof that the project was correct; the repository, outputs, and workflow were also checked manually.
 
 
 ### Tilly AI
