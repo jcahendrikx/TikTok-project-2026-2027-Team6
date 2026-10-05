@@ -1,6 +1,6 @@
 # AI Tools Usage Description
 
-## Week 2
+## Assignment 1
 ### ChatGPT
 #### Version & Settings
 - Model: GPT-5.6 Sol

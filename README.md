@@ -102,7 +102,7 @@ The R packages used across the workflows include:
 - DBI
 - knitr
 - fixest
-- tinytex
+
 
 The required R packages can be installed using:
 
@@ -114,7 +114,6 @@ install.packages("RSQLite")
 install.packages("DBI")
 install.packages("knitr")
 install.packages("fixest")
-install.packages("tinytex")
 ```
 
 If a LaTeX installation is not already available, TinyTeX can be installed through Quarto using:
@@ -193,7 +192,7 @@ The final report combines data inspection, summary analyses, the regression anal
 
 ## Group Members and Contributions
 
-- Alex — contributed to project setup, the session-data workflow, SQLite integration, the final analysis report, reproducibility improvements, Makefile development, debugging, review, and documentation.
+- Alex — contributed to the project setup, the video analysis, the session-data workflow, SQLite integration, the final analysis report, reproducibility improvements, Makefile development, debugging, review, and documentation.
 - Nanyun — contributed to the video analysis, watch-events workflow, regression analysis, data cleaning and analysis, reproducibility testing, Makefile integration, debugging, review, and documentation.
 
 Project changes were reviewed collaboratively. Both team members reviewed and modified each other's work before integration into the main branch.
